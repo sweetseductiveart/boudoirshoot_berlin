@@ -242,7 +242,16 @@ hr{
     padding: 14px;
   }
 }
-
+.hero__note{
+  margin-top: 10px;
+  max-width: 64ch;
+  color: rgba(255,255,255,.78);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.hero__note strong{
+  color: rgba(255,255,255,.92);
+}
 /* Meta pills */
 .hero__meta{
   display:flex;
