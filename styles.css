@@ -1,13 +1,11 @@
-/* ===== Modern compact SPA-style event page (SPA tabs + iOS-safe hero + improved whitespace) =====
-   FIXED:
-   - Removed duplicated / conflicting blocks (grid spacing + iOS fixes were repeated)
-   - Eliminated “band / seam” by smoothing BODY background gradients (no hard stops)
-   - Made spacing deterministic (no double gap + margin fights)
-   - Kept iOS-safe hero fill + clickability
-   - Kept cards slightly gradient on desktop, flat on iOS only (optional, but safe)
+/* ===== Modern compact SPA-style event page (SPA tabs + stable background + iOS-safe hero) =====
+   Fixes requested:
+   - Backgrounds NEVER repeat
+   - Background gradient stays “fixed” in one place (static) -> use background-attachment: fixed (desktop)
+   - iOS fallback: fixed is buggy on iOS, so we switch to scroll there (but still no-repeat)
+   - Also ensures no “banding seam” by using smooth stops
 */
 
-/* ===== Tokens ===== */
 :root{
   --bg: #0b0b10;
 
@@ -26,7 +24,6 @@
   --maxw: 1120px;
   --pad: 18px;
 
-  /* whitespace knobs */
   --gap: 18px;
   --cardPad: 18px;
   --sectionPad: 18px;
@@ -35,12 +32,18 @@
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 
-/* ===== Page background (NO hard stops -> no visible band/seam) ===== */
 body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
-  background:
-    /* top glow pushed up + smooth fade */
+  color: var(--text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* IMPORTANT: static, non-repeating layered background */
+  background-color: var(--bg);
+
+  background-image:
     radial-gradient(1600px 1050px at 50% -320px,
       rgba(255,255,255,.11) 0%,
       rgba(255,255,255,.075) 20%,
@@ -49,23 +52,35 @@ body{
       rgba(255,255,255,.010) 70%,
       rgba(255,255,255,0) 88%
     ),
-    /* soft center vignette */
     radial-gradient(1400px 1100px at 50% 42%,
       rgba(0,0,0,0) 0%,
       rgba(0,0,0,.14) 55%,
       rgba(0,0,0,.32) 85%,
       rgba(0,0,0,.44) 100%
-    ),
-    var(--bg);
-  background-color: var(--bg);
-  background-attachment: scroll; /* stable on mobile + prevents weird composite bands */
-  color: var(--text);
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    );
+
+  /* never tile */
+  background-repeat: no-repeat, no-repeat;
+
+  /* keep the gradients “anchored” */
+  background-position: 50% 0%, 50% 50%;
+
+  /* keep them stable on the viewport (desktop) */
+  background-attachment: fixed, fixed;
+
+  /* size large enough to avoid edges appearing while scrolling */
+  background-size: 200% 1200px, 200% 1600px;
 }
 
-/* ===== Links ===== */
+/* iOS: background-attachment: fixed is unreliable -> fall back to scroll, still no-repeat */
+@supports (-webkit-touch-callout: none){
+  body{
+    background-attachment: scroll, scroll;
+    /* still anchored, just not fixed */
+  }
+}
+
+/* Links */
 a{
   color: var(--text);
   text-decoration: none;
@@ -79,7 +94,7 @@ a:focus-visible{
   border-radius: 10px;
 }
 
-/* ===== Layout helpers ===== */
+/* Layout helpers */
 .container{
   width: min(var(--maxw), calc(100vw - 2*var(--pad)));
   margin: 0 auto;
@@ -89,10 +104,7 @@ a:focus-visible{
 .spacer{ height: 16px; }
 
 h1,h2,h3{ margin:0; letter-spacing: -.015em; }
-h1{
-  font-size: clamp(28px, 3.8vw, 46px);
-  line-height: 1.08;
-}
+h1{ font-size: clamp(28px, 3.8vw, 46px); line-height: 1.08; }
 h2{ font-size: 20px; color: var(--text); }
 h3{ font-size: 15.5px; color: var(--text); }
 p{ margin:0; color: var(--muted); }
@@ -104,7 +116,7 @@ hr{
   margin: 16px 0;
 }
 
-/* ===== Card ===== */
+/* Card */
 .card{
   background: linear-gradient(180deg, var(--panelA) 0%, var(--panelB) 100%);
   border: 1px solid var(--line);
@@ -114,7 +126,7 @@ hr{
   background-clip: padding-box;
 }
 
-/* ===== Top bar (tabs) ===== */
+/* Top bar */
 .topbar{
   position: sticky;
   top: 0;
@@ -126,7 +138,6 @@ hr{
   background: rgba(11,11,16,.70);
   border-bottom: 1px solid rgba(255,255,255,.10);
 
-  /* compositing stability */
   transform: translateZ(0);
   will-change: transform;
 }
@@ -177,7 +188,6 @@ hr{
 }
 .tab:focus-visible{ outline:none; box-shadow: var(--focusRing); }
 
-/* Mobile: scrollable tab row */
 @media (max-width: 560px){
   .tabs{
     flex-wrap: nowrap;
@@ -190,10 +200,9 @@ hr{
   .tab{ white-space: nowrap; }
 }
 
-/* Make taps reliable */
 .tab, .btn, a, button{ -webkit-tap-highlight-color: transparent; }
 
-/* ===== Hero ===== */
+/* Hero */
 .hero{
   position: relative;
   border-radius: var(--radius);
@@ -201,12 +210,8 @@ hr{
   border: 1px solid rgba(255,255,255,.12);
   box-shadow: var(--shadow);
   isolation: isolate;
-
-  /* hero height should not depend on the bg element height */
   min-height: 380px;
 }
-
-/* Background fills whole hero */
 .hero__bg{
   position:absolute;
   inset:0;
@@ -217,8 +222,6 @@ hr{
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
-
-/* Overlay fills whole hero and never blocks clicks */
 .hero__shade{
   position:absolute;
   inset:0;
@@ -235,12 +238,12 @@ hr{
       rgba(255,255,255,.12) 0%,
       rgba(255,255,255,0) 68%
     );
-  background-repeat:no-repeat;
+  background-repeat:no-repeat, no-repeat;
+  background-position: 50% 0%, 50% 0%;
+  background-size: 100% 100%, 100% 100%;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
-
-/* Content above everything */
 .hero__content{
   position: relative;
   z-index: 2;
@@ -297,7 +300,6 @@ hr{
   font-size: 12.5px;
 }
 
-/* Buttons */
 .btnrow{ display:flex; gap:12px; flex-wrap:wrap; margin-top: 6px; }
 .btn{
   display:inline-flex;
@@ -329,7 +331,6 @@ hr{
   color: rgba(255,255,255,.92);
 }
 
-/* Mobile hero comfort */
 @media (max-width: 560px){
   .hero{ min-height: 560px; }
   .hero__content{ padding: 18px 14px; gap: 16px; }
@@ -337,7 +338,7 @@ hr{
   .pill{ padding: 9px 12px; }
 }
 
-/* ===== Main area ===== */
+/* Main area */
 .page{ padding: 18px 0 22px; }
 
 .grid{
@@ -347,15 +348,11 @@ hr{
   row-gap: 22px;
   align-items:start;
 }
-
-/* IMPORTANT:
-   Do NOT mix grid row-gap with additional margin-top rules on desktop.
-   On mobile stack, use ONLY row-gap (clean + predictable). */
 @media (max-width: 980px){
   .grid{ grid-template-columns: 1fr; row-gap: 24px; }
 }
 
-/* Sections inside tab panels */
+/* Sections */
 .section{ padding: 0; }
 .section__header{
   display:flex;
@@ -373,10 +370,9 @@ hr{
 }
 .section__body{
   padding: var(--cardPad);
-  padding-top: 18px;          /* more air under header */
+  padding-top: 18px;
 }
 
-/* Typography rhythm inside bodies */
 .section__body p + p{ margin-top: 10px; }
 .section__body h3{ margin-top: 10px; }
 
@@ -392,7 +388,6 @@ hr{
 @media (max-width: 560px){
   .kv{ grid-template-columns: 1fr; }
 }
-
 .kv .item{
   padding: 13px 14px;
   border-radius: 14px;
@@ -401,12 +396,11 @@ hr{
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  min-height: 96px;          /* desktop alignment */
+  min-height: 96px;
 }
 @media (max-width: 560px){
   .kv .item{ min-height: unset; }
 }
-
 .kv .item strong{
   display:block;
   font-size: 13px;
@@ -471,7 +465,7 @@ li{ margin: 8px 0; }
 .tabpanels [role="tabpanel"]{ display:none; }
 .tabpanels [role="tabpanel"][data-active="true"]{ display:block; }
 
-/* Sidebar spacing: ensure blocks never “stick” */
+/* Sidebar spacing: never “stick” */
 aside.card .section__body > * + *{ margin-top: 16px; }
 aside.card hr{ margin: 18px 0; }
 
@@ -480,7 +474,7 @@ aside.card hr{ margin: 18px 0; }
   *{ transition:none !important; scroll-behavior:auto !important; }
 }
 
-/* Small screens: slightly more breathing room */
+/* Small screens */
 @media (max-width: 520px){
   .page{ padding: 14px 0 22px; }
   .grid{ row-gap: 24px; }
@@ -488,8 +482,7 @@ aside.card hr{ margin: 18px 0; }
   .section__body{ padding: 16px; padding-top: 16px; }
 }
 
-/* ===== iOS-only: simplify card background to avoid scroll/composite artifacts =====
-   (This is optional; it does NOT affect the “band” issue, which is fixed above.) */
+/* iOS-only: simplify card background to reduce compositing artifacts (optional) */
 @supports (-webkit-touch-callout: none){
   .card{
     background: rgba(255,255,255,.055);
