@@ -511,3 +511,50 @@ aside.card hr{
   margin: 18px 0;
 }
 
+/* ===== FIX: iOS/WebKit gradient seams + robust mobile spacing ===== */
+
+/* 1) Kill gradient seams on iOS (Safari + Chrome iOS use WebKit) */
+@supports (-webkit-touch-callout: none){
+  .card{
+    /* replace gradient background with flat color (prevents banding seams) */
+    background: rgba(255,255,255,.055) !important;
+    box-shadow: 0 10px 34px rgba(0,0,0,.42) !important;
+  }
+
+  /* header background also flat to avoid seam against card */
+  .section__header{
+    background: rgba(255,255,255,.035) !important;
+  }
+}
+
+/* 2) Make sure no “background painting” tricks create seams */
+.card,
+.section__header{
+  background-clip: padding-box;
+}
+
+/* 3) Robust spacing on mobile:
+   when layout collapses to 1 column, enforce spacing between consecutive cards */
+@media (max-width: 980px){
+  .grid{ gap: 18px; row-gap: 18px; }
+
+  /* works regardless of whether elements are article/aside etc. */
+  .grid > * + *{
+    margin-top: 18px !important;
+  }
+
+  /* if Quick Facts and Impressum are BOTH cards inside the aside body */
+  aside .card + .card{
+    margin-top: 18px !important;
+  }
+}
+
+/* 4) If Quick Facts + Impressum are NOT separate cards but sections/blocks:
+   add spacing between headings/blocks inside sidebar */
+aside.card .section__body > * + *{
+  margin-top: 14px;
+}
+aside.card hr{
+  margin: 16px 0;
+}
+
