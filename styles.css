@@ -347,9 +347,15 @@ hr{
   column-gap: var(--gap);
   row-gap: 22px;
   align-items:start;
+  margin-bottom: 22px;
 }
+
 @media (max-width: 980px){
   .grid{ grid-template-columns: 1fr; row-gap: 24px; }
+}
+
+@media (max-width: 560px){
+  .grid{ margin-bottom: 18px; }
 }
 
 /* Sections */
