@@ -390,28 +390,74 @@
 </main>
 
 <script>
-const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
-const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+  const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
 
-const hashToPanel = {
-  "konzept": "tab-konzept",
-  "ablauf": "tab-ablauf",
-  "divers": "tab-divers",
-  "codex": "tab-codex",
-  "kosten": "tab-kosten",
-  "anmeldung": "tab-anmeldung"
-};
+  const hashToPanel = {
+    konzept: "tab-konzept",
+    ablauf: "tab-ablauf",
+    divers: "tab-divers",
+    codex: "tab-codex",
+    kosten: "tab-kosten",
+    anmeldung: "tab-anmeldung"
+  };
 
-function activate(id) {
-  tabs.forEach(t => t.setAttribute("aria-selected", t.getAttribute("aria-controls") === id));
-  panels.forEach(p => p.dataset.active = p.id === id);
-  const hash = Object.keys(hashToPanel).find(k => hashToPanel[k] === id);
-  if (hash) history.replaceState(null, "", "#" + hash);
-}
+  const panelToHash = Object.fromEntries(
+    Object.entries(hashToPanel).map(([h, p]) => [p, h])
+  );
 
-tabs.forEach(t => t.addEventListener("click", () => activate(t.getAttribute("aria-controls"))));
-activate(hashToPanel[location.hash.replace("#","")] || "tab-konzept");
+  function activate(panelId, { updateHash = true, scrollTop = false } = {}) {
+    // tabs
+    tabs.forEach(t => {
+      const selected = (t.getAttribute("aria-controls") === panelId);
+      t.setAttribute("aria-selected", selected ? "true" : "false");
+    });
+
+    // panels
+    panels.forEach(p => {
+      p.dataset.active = (p.id === panelId) ? "true" : "false";
+    });
+
+    // hash sync (for sharing / deep links)
+    if (updateHash) {
+      const h = panelToHash[panelId];
+      if (h) history.replaceState(null, "", "#" + h);
+    }
+
+    if (scrollTop) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  function routeFromHash() {
+    const h = (location.hash || "").replace("#", "");
+    const panel = hashToPanel[h] || "tab-konzept";
+    // updateHash:false avoids redundant replaceState when reacting to hashchange
+    activate(panel, { updateHash: false });
+  }
+
+  // 1) Tab clicks
+  tabs.forEach(t => {
+    t.addEventListener("click", () => {
+      activate(t.getAttribute("aria-controls"), { updateHash: true, scrollTop: true });
+    });
+  });
+
+  // 2) Links/buttons that should switch panels (Hero buttons, footer links etc.)
+  document.querySelectorAll("[data-jump]").forEach(a => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      activate(a.dataset.jump, { updateHash: true, scrollTop: true });
+    });
+  });
+
+  // 3) React to hash changes (covers: direct URL share, manual hash change, normal anchor navigation)
+  window.addEventListener("hashchange", routeFromHash);
+
+  // Initial route
+  routeFromHash();
 </script>
+
 
 </body>
 </html>
