@@ -1,17 +1,26 @@
-/* ===== Modern compact SPA-style event page (SPA tabs + iOS-safe hero + improved whitespace) ===== */
+/* ===== Modern compact SPA-style event page (SPA tabs + iOS-safe hero + improved whitespace) =====
+   FIXED:
+   - Removed duplicated / conflicting blocks (grid spacing + iOS fixes were repeated)
+   - Eliminated “band / seam” by smoothing BODY background gradients (no hard stops)
+   - Made spacing deterministic (no double gap + margin fights)
+   - Kept iOS-safe hero fill + clickability
+   - Kept cards slightly gradient on desktop, flat on iOS only (optional, but safe)
+*/
 
+/* ===== Tokens ===== */
 :root{
   --bg: #0b0b10;
-  --panel: rgba(255,255,255,.06);
-  --panel2: rgba(255,255,255,.045);
-  --line: rgba(255,255,255,.12);
-  --line2: rgba(255,255,255,.18);
-  --text: rgba(255,255,255,.92);
+
+  --panelA: rgba(255,255,255,.060);
+  --panelB: rgba(255,255,255,.040);
+
+  --line:  rgba(255,255,255,.12);
+  --text:  rgba(255,255,255,.92);
   --muted: rgba(255,255,255,.72);
   --faint: rgba(255,255,255,.55);
+
   --shadow: 0 14px 46px rgba(0,0,0,.48);
   --radius: 18px;
-
   --focusRing: 0 0 0 4px rgba(255,255,255,.16);
 
   --maxw: 1120px;
@@ -25,33 +34,38 @@
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
+
+/* ===== Page background (NO hard stops -> no visible band/seam) ===== */
 body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
   background:
-    /* softer top glow – moved upwards so the edge never crosses content */
-    radial-gradient(1400px 900px at 50% -260px,
-      rgba(255,255,255,.10) 0%,
-      rgba(255,255,255,.06) 22%,
-      rgba(255,255,255,.03) 40%,
-      rgba(255,255,255,.015) 55%,
-      rgba(255,255,255,0) 78%
+    /* top glow pushed up + smooth fade */
+    radial-gradient(1600px 1050px at 50% -320px,
+      rgba(255,255,255,.11) 0%,
+      rgba(255,255,255,.075) 20%,
+      rgba(255,255,255,.040) 40%,
+      rgba(255,255,255,.020) 58%,
+      rgba(255,255,255,.010) 70%,
+      rgba(255,255,255,0) 88%
     ),
-    /* subtle vignette to keep edges calm */
-    radial-gradient(1200px 900px at 50% 40%,
+    /* soft center vignette */
+    radial-gradient(1400px 1100px at 50% 42%,
       rgba(0,0,0,0) 0%,
-      rgba(0,0,0,.22) 70%,
-      rgba(0,0,0,.38) 100%
+      rgba(0,0,0,.14) 55%,
+      rgba(0,0,0,.32) 85%,
+      rgba(0,0,0,.44) 100%
     ),
     var(--bg);
   background-color: var(--bg);
+  background-attachment: scroll; /* stable on mobile + prevents weird composite bands */
   color: var(--text);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Links */
+/* ===== Links ===== */
 a{
   color: var(--text);
   text-decoration: none;
@@ -65,7 +79,7 @@ a:focus-visible{
   border-radius: 10px;
 }
 
-/* Layout helpers */
+/* ===== Layout helpers ===== */
 .container{
   width: min(var(--maxw), calc(100vw - 2*var(--pad)));
   margin: 0 auto;
@@ -90,12 +104,14 @@ hr{
   margin: 16px 0;
 }
 
+/* ===== Card ===== */
 .card{
-  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+  background: linear-gradient(180deg, var(--panelA) 0%, var(--panelB) 100%);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow:hidden;
+  background-clip: padding-box;
 }
 
 /* ===== Top bar (tabs) ===== */
@@ -103,9 +119,16 @@ hr{
   position: sticky;
   top: 0;
   z-index: 50;
+
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+
   background: rgba(11,11,16,.70);
   border-bottom: 1px solid rgba(255,255,255,.10);
+
+  /* compositing stability */
+  transform: translateZ(0);
+  will-change: transform;
 }
 .topbar__inner{
   padding: 12px 0;
@@ -168,9 +191,7 @@ hr{
 }
 
 /* Make taps reliable */
-.tab, .btn, a, button{
-  -webkit-tap-highlight-color: transparent;
-}
+.tab, .btn, a, button{ -webkit-tap-highlight-color: transparent; }
 
 /* ===== Hero ===== */
 .hero{
@@ -180,11 +201,12 @@ hr{
   border: 1px solid rgba(255,255,255,.12);
   box-shadow: var(--shadow);
   isolation: isolate;
-  /* Critical: hero height should not depend on the bg element height */
+
+  /* hero height should not depend on the bg element height */
   min-height: 380px;
 }
 
-/* Background fills whole hero (fixes iOS “doesn't fill”) */
+/* Background fills whole hero */
 .hero__bg{
   position:absolute;
   inset:0;
@@ -192,6 +214,8 @@ hr{
   transform: scale(1.02);
   z-index: 0;
   pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Overlay fills whole hero and never blocks clicks */
@@ -201,9 +225,19 @@ hr{
   pointer-events: none;
   z-index: 1;
   background:
-    linear-gradient(180deg, rgba(0,0,0,.10) 0%, rgba(0,0,0,.52) 60%, rgba(11,11,16,.96) 100%),
-    radial-gradient(900px 260px at 50% 0%, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 60%);
+    linear-gradient(180deg,
+      rgba(0,0,0,.10) 0%,
+      rgba(0,0,0,.38) 45%,
+      rgba(0,0,0,.62) 70%,
+      rgba(11,11,16,.96) 100%
+    ),
+    radial-gradient(1000px 320px at 50% 0%,
+      rgba(255,255,255,.12) 0%,
+      rgba(255,255,255,0) 68%
+    );
   background-repeat:no-repeat;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Content above everything */
@@ -309,15 +343,16 @@ hr{
 .grid{
   display:grid;
   grid-template-columns: 1.2fr .8fr;
-  gap: var(--gap);
-  row-gap: 22px;              /* stronger vertical rhythm */
+  column-gap: var(--gap);
+  row-gap: 22px;
   align-items:start;
 }
 
+/* IMPORTANT:
+   Do NOT mix grid row-gap with additional margin-top rules on desktop.
+   On mobile stack, use ONLY row-gap (clean + predictable). */
 @media (max-width: 980px){
-  .grid{ grid-template-columns: 1fr; }
-  /* Ensure stacked blocks never “stick” even if structure changes */
-  .grid > * + *{ margin-top: 22px; }
+  .grid{ grid-template-columns: 1fr; row-gap: 24px; }
 }
 
 /* Sections inside tab panels */
@@ -330,6 +365,7 @@ hr{
   padding: var(--sectionPad) var(--cardPad);
   border-bottom: 1px solid var(--line);
   background: rgba(255,255,255,.03);
+  background-clip: padding-box;
 }
 .section__header small{
   opacity: .75;
@@ -415,7 +451,7 @@ li{ margin: 8px 0; }
   border:0;
 }
 
-/* Footer (sidebar footer in your aside card) */
+/* Footer */
 .footer{
   margin-top: 10px;
   padding-top: 2px;
@@ -435,11 +471,9 @@ li{ margin: 8px 0; }
 .tabpanels [role="tabpanel"]{ display:none; }
 .tabpanels [role="tabpanel"][data-active="true"]{ display:block; }
 
-/* Prevent “Quick Facts / Impressum sticking” even if they are in the same sidebar card */
-aside.card .section__body > * + *{
-  margin-top: 16px;
-}
-aside.card hr{ margin: 16px 0; }
+/* Sidebar spacing: ensure blocks never “stick” */
+aside.card .section__body > * + *{ margin-top: 16px; }
+aside.card hr{ margin: 18px 0; }
 
 /* Reduce motion */
 @media (prefers-reduced-motion: reduce){
@@ -448,126 +482,20 @@ aside.card hr{ margin: 16px 0; }
 
 /* Small screens: slightly more breathing room */
 @media (max-width: 520px){
-  :root{
-    --gap: 18px;
-    --cardPad: 18px;
-    --sectionPad: 18px;
-  }
   .page{ padding: 14px 0 22px; }
-  .grid{ gap: 16px; row-gap: 22px; }
+  .grid{ row-gap: 24px; }
   .spacer{ height: 16px; }
   .section__body{ padding: 16px; padding-top: 16px; }
 }
 
-/* ===== iOS gradient/compositing fix + spacing polish ===== */
-
-/* 1) iOS/Safari Rendering-Artefakte: vermeide problematische Kombination aus
-   backdrop-filter + komplexen Schatten auf großen Flächen beim Scrollen */
-.topbar{
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  transform: translateZ(0);           /* forces own compositing layer */
-  will-change: transform;
-}
-
-/* Cards: weniger “harte” GPU-Artefakte durch etwas weichere Shadow/Background auf iOS */
+/* ===== iOS-only: simplify card background to avoid scroll/composite artifacts =====
+   (This is optional; it does NOT affect the “band” issue, which is fixed above.) */
 @supports (-webkit-touch-callout: none){
   .card{
-    box-shadow: 0 10px 34px rgba(0,0,0,.40); /* etwas weniger heavy */
-    background: rgba(255,255,255,.055);      /* statt komplexem linear-gradient */
+    background: rgba(255,255,255,.055);
+    box-shadow: 0 10px 34px rgba(0,0,0,.40);
   }
-}
-
-/* 2) Der “Balken” kommt oft von nested backgrounds: setze eine stabile Basis */
-body{
-  background-attachment: scroll;
-}
-
-/* 3) Stelle sicher, dass keine pseudo-layers über Inhalte malen */
-.hero__shade,
-.hero__bg{
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* 4) Spacing: Quick Facts & Impressum klar trennen */
-.grid > * + *{
-  margin-top: 0; /* reset (falls schon gesetzt) */
-}
-
-@media (max-width: 980px){
-  .grid{
-    row-gap: 24px;
-  }
-  .grid > * + *{
-    margin-top: 24px; /* zuverlässiger Abstand zwischen stacked cards */
-  }
-}
-
-/* Wenn Quick Facts & Impressum im selben Container stehen (z.B. gleiche Card) */
-aside.card .section__body > .card + .card{
-  margin-top: 22px;
-}
-
-/* Falls Impressum kein eigenes .card ist, sondern ein Block: gib Headings Luft */
-aside.card .section__body h2,
-aside.card .section__body h3{
-  margin-top: 10px;
-}
-aside.card .section__body > * + *{
-  margin-top: 16px;
-}
-
-/* 5) Optional: Divider-Linie in der Sidebar etwas deutlicher */
-aside.card hr{
-  opacity: .9;
-  margin: 18px 0;
-}
-
-/* ===== FIX: iOS/WebKit gradient seams + robust mobile spacing ===== */
-
-/* 1) Kill gradient seams on iOS (Safari + Chrome iOS use WebKit) */
-@supports (-webkit-touch-callout: none){
-  .card{
-    /* replace gradient background with flat color (prevents banding seams) */
-    background: rgba(255,255,255,.055) !important;
-    box-shadow: 0 10px 34px rgba(0,0,0,.42) !important;
-  }
-
-  /* header background also flat to avoid seam against card */
   .section__header{
-    background: rgba(255,255,255,.035) !important;
+    background: rgba(255,255,255,.035);
   }
 }
-
-/* 2) Make sure no “background painting” tricks create seams */
-.card,
-.section__header{
-  background-clip: padding-box;
-}
-
-/* 3) Robust spacing on mobile:
-   when layout collapses to 1 column, enforce spacing between consecutive cards */
-@media (max-width: 980px){
-  .grid{ gap: 18px; row-gap: 18px; }
-
-  /* works regardless of whether elements are article/aside etc. */
-  .grid > * + *{
-    margin-top: 18px !important;
-  }
-
-  /* if Quick Facts and Impressum are BOTH cards inside the aside body */
-  aside .card + .card{
-    margin-top: 18px !important;
-  }
-}
-
-/* 4) If Quick Facts + Impressum are NOT separate cards but sections/blocks:
-   add spacing between headings/blocks inside sidebar */
-aside.card .section__body > * + *{
-  margin-top: 14px;
-}
-aside.card hr{
-  margin: 16px 0;
-}
-
