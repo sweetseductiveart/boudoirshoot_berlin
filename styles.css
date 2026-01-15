@@ -445,3 +445,69 @@ aside.card hr{ margin: 16px 0; }
   .spacer{ height: 16px; }
   .section__body{ padding: 16px; padding-top: 16px; }
 }
+
+/* ===== iOS gradient/compositing fix + spacing polish ===== */
+
+/* 1) iOS/Safari Rendering-Artefakte: vermeide problematische Kombination aus
+   backdrop-filter + komplexen Schatten auf großen Flächen beim Scrollen */
+.topbar{
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transform: translateZ(0);           /* forces own compositing layer */
+  will-change: transform;
+}
+
+/* Cards: weniger “harte” GPU-Artefakte durch etwas weichere Shadow/Background auf iOS */
+@supports (-webkit-touch-callout: none){
+  .card{
+    box-shadow: 0 10px 34px rgba(0,0,0,.40); /* etwas weniger heavy */
+    background: rgba(255,255,255,.055);      /* statt komplexem linear-gradient */
+  }
+}
+
+/* 2) Der “Balken” kommt oft von nested backgrounds: setze eine stabile Basis */
+body{
+  background-attachment: scroll;
+}
+
+/* 3) Stelle sicher, dass keine pseudo-layers über Inhalte malen */
+.hero__shade,
+.hero__bg{
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 4) Spacing: Quick Facts & Impressum klar trennen */
+.grid > * + *{
+  margin-top: 0; /* reset (falls schon gesetzt) */
+}
+
+@media (max-width: 980px){
+  .grid{
+    row-gap: 24px;
+  }
+  .grid > * + *{
+    margin-top: 24px; /* zuverlässiger Abstand zwischen stacked cards */
+  }
+}
+
+/* Wenn Quick Facts & Impressum im selben Container stehen (z.B. gleiche Card) */
+aside.card .section__body > .card + .card{
+  margin-top: 22px;
+}
+
+/* Falls Impressum kein eigenes .card ist, sondern ein Block: gib Headings Luft */
+aside.card .section__body h2,
+aside.card .section__body h3{
+  margin-top: 10px;
+}
+aside.card .section__body > * + *{
+  margin-top: 16px;
+}
+
+/* 5) Optional: Divider-Linie in der Sidebar etwas deutlicher */
+aside.card hr{
+  opacity: .9;
+  margin: 18px 0;
+}
+
