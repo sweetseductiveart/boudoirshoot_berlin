@@ -515,3 +515,62 @@ aside.card hr{ margin: 18px 0; }
     background: rgba(255,255,255,.035);
   }
 }
+
+/* ===== Rechtliches kompakter (Impressum + Datenschutzerklärung) ===== */
+[aria-label="Rechtliches"]{
+  /* optional: etwas weniger “Wuchtigkeit” der Card */
+  box-shadow: 0 10px 34px rgba(0,0,0,.40);
+}
+
+[aria-label="Rechtliches"] .section__header{
+  padding: 14px var(--cardPad);          /* Header etwas niedriger */
+}
+
+[aria-label="Rechtliches"] .section__body{
+  padding: 16px var(--cardPad);          /* weniger Innenabstand */
+  padding-top: 14px;
+  font-size: 13.5px;                      /* kleiner als Standard */
+  line-height: 1.5;                       /* kompakter */
+}
+
+[aria-label="Rechtliches"] p{
+  color: rgba(255,255,255,.66);           /* wirkt “leichter” */
+}
+
+[aria-label="Rechtliches"] h3{
+  font-size: 14px;                        /* kleiner */
+  margin-top: 12px;                       /* weniger Abstand */
+}
+
+[aria-label="Rechtliches"] .section__body p + p{
+  margin-top: 8px;                        /* weniger Absatzabstand */
+}
+
+/* Listen in Datenschutzerklärung kompakter */
+[aria-label="Rechtliches"] ul{
+  margin-top: 8px;
+  padding-left: 16px;
+}
+[aria-label="Rechtliches"] li{
+  margin: 6px 0;
+}
+
+/* Links weniger “dominant” */
+[aria-label="Rechtliches"] a{
+  border-bottom-color: rgba(255,255,255,.16);
+}
+[aria-label="Rechtliches"] a:hover{
+  border-bottom-color: rgba(255,255,255,.30);
+}
+
+/* Mobile: noch etwas tighter */
+@media (max-width: 560px){
+  [aria-label="Rechtliches"] .section__header{
+    padding: 12px 16px;
+  }
+  [aria-label="Rechtliches"] .section__body{
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+}
+
