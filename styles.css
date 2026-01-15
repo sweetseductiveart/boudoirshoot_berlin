@@ -29,7 +29,20 @@ body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
   background:
-    radial-gradient(1000px 650px at 50% 0%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 62%),
+    /* softer top glow – moved upwards so the edge never crosses content */
+    radial-gradient(1400px 900px at 50% -260px,
+      rgba(255,255,255,.10) 0%,
+      rgba(255,255,255,.06) 22%,
+      rgba(255,255,255,.03) 40%,
+      rgba(255,255,255,.015) 55%,
+      rgba(255,255,255,0) 78%
+    ),
+    /* subtle vignette to keep edges calm */
+    radial-gradient(1200px 900px at 50% 40%,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,.22) 70%,
+      rgba(0,0,0,.38) 100%
+    ),
     var(--bg);
   background-color: var(--bg);
   color: var(--text);
