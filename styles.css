@@ -188,40 +188,59 @@ hr{
 .hero{
   position: relative;
   border-radius: var(--radius);
-  overflow:hidden;
+  overflow: hidden;
   border: 1px solid rgba(255,255,255,.12);
   box-shadow: var(--shadow);
-  isolation: isolate; /* ✅ clean stacking context (fixes Safari oddities) */
+  isolation: isolate;
+
+  /* key fix: stack layers with grid (container height = max(bg, content)) */
+  display: grid;
 }
 
-/* Image layer */
+/* all hero layers overlap */
+.hero__bg,
+.hero__shade,
+.hero__content{
+  grid-area: 1 / 1;
+}
+
 .hero__bg{
-  height: clamp(240px, 34vh, 320px);
+  min-height: 280px;
+  height: clamp(280px, 36vh, 380px);
   background: url("assets/header.jpg") center/cover no-repeat;
   transform: scale(1.02);
   position: relative;
   z-index: 0;
-  pointer-events: none; /* ✅ never block clicks */
+  pointer-events: none;
 }
 
-/* Overlay layer */
 .hero__shade{
-  position:absolute;
-  inset:0;
-  pointer-events: none; /* ✅ never block clicks */
+  position: relative;          /* no absolute needed */
   z-index: 1;
+  pointer-events: none;
   background:
     linear-gradient(180deg, rgba(0,0,0,.10) 0%, rgba(0,0,0,.52) 60%, rgba(11,11,16,.96) 100%),
     radial-gradient(900px 260px at 50% 0%, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 60%);
-  background-repeat: no-repeat; /* ✅ avoid any tiling artifacts */
+  background-repeat: no-repeat;
 }
 
-/* Content layer */
+/* content is now normal flow inside the grid stack -> no clipping */
 .hero__content{
-  position:absolute;
-  left:0; right:0; bottom:0;
+  position: relative;          /* IMPORTANT: was absolute before */
+  z-index: 2;
+  align-self: end;
   padding: 20px;
-  z-index: 2; /* ✅ always above shade */
+}
+
+/* tighten spacing on small phones */
+@media (max-width: 560px){
+  .hero__bg{
+    min-height: 340px;
+    height: clamp(340px, 48vh, 520px); /* more room for title + pills + buttons */
+  }
+  .hero__content{
+    padding: 14px;
+  }
 }
 
 /* Meta pills */
