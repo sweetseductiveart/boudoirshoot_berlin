@@ -348,4 +348,100 @@
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; scroll-behavior:auto !important; }
   }
+
+/* ===== FIXES: Mobile header + overlay clickability + gradient artifacts ===== */
+
+/* iOS/Safari: make sure background layers don't cause weird paint/tiling */
+html, body {
+  background-color: var(--bg);
+}
+
+/* --- Topbar: allow wrapping on small screens, avoid cramped layout --- */
+.topbar__inner{
+  flex-wrap: wrap;            /* allow brand + tabs to wrap */
+  align-items: flex-start;
+  padding: 12px 0;
+}
+
+/* brand should not force width on mobile */
+.brand{
+  min-width: 0;               /* overrides old min-width behavior */
+  flex: 1 1 260px;
+}
+
+/* tabs: keep them usable on mobile */
+.tabs{
+  flex: 1 1 100%;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+/* OPTION A (recommended): make tab row horizontally scrollable instead of multi-line */
+@media (max-width: 520px){
+  .tabs{
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;        /* Firefox */
+  }
+  .tabs::-webkit-scrollbar{ display:none; } /* WebKit */
+  .tab{
+    white-space: nowrap;
+  }
+}
+
+/* Make taps reliable */
+.tab, .btn, a, button{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- Hero layering: guarantee clicks work (shade/bg never intercept taps) --- */
+.hero{
+  position: relative;
+  isolation: isolate;            /* creates a clean stacking context */
+}
+
+.hero__bg,
+.hero__shade{
+  pointer-events: none;          /* never block taps/clicks */
+}
+
+/* ensure correct stacking */
+.hero__bg{
+  position: relative;
+  z-index: 0;
+  background-repeat: no-repeat;
+}
+
+.hero__shade{
+  z-index: 1;
+  background-repeat: no-repeat;
+}
+
+.hero__content{
+  z-index: 2;                    /* always above overlays */
+  position: absolute;
+}
+
+/* --- Improve hero proportions on mobile so it doesn't feel "too tight" --- */
+.hero__bg{
+  height: clamp(220px, 34vh, 320px);
+}
+
+/* --- Optional: slightly more breathing room in hero pills/buttons on mobile --- */
+@media (max-width: 520px){
+  .hero__content{ padding: 14px; }
+  .hero__meta{ gap: 8px; }
+  .pill{ padding: 8px 10px; }
+  .btn{ padding: 11px 13px; }
+}
+
+/* --- Prevent the page from feeling cramped: slightly larger gaps on mobile --- */
+@media (max-width: 520px){
+  .page{ padding: 14px 0 22px; }
+  .grid{ gap: 14px; }
+  .section__body{ padding: 16px; }
+}
+
   
