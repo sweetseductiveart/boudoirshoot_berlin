@@ -6,6 +6,7 @@
    - Remove “gradient end band” by NOT sizing gradients to a limited px-height
    - Ensure spacing between .grid and next .card section (Rechtliches)
    - Provide codex “wide card” styling to match kv .item cards
+   - Kontakt: balanced, same height image/info, no sticky-to-edge, mail wraps safely
 */
 
 :root{
@@ -70,7 +71,6 @@ body{
   background-attachment: fixed, fixed;
 
   /* do NOT set background-size to a limited px height -> avoids “end band” */
-  /* (gradients already paint the full box; sizing them can cause edges) */
 }
 
 /* iOS: background-attachment: fixed is unreliable -> fall back to scroll, still no-repeat */
@@ -518,35 +518,27 @@ aside.card hr{ margin: 18px 0; }
 
 /* ===== Rechtliches kompakter (Impressum + Datenschutzerklärung) ===== */
 [aria-label="Rechtliches"]{
-  /* optional: etwas weniger “Wuchtigkeit” der Card */
   box-shadow: 0 10px 34px rgba(0,0,0,.40);
 }
-
 [aria-label="Rechtliches"] .section__header{
-  padding: 14px var(--cardPad);          /* Header etwas niedriger */
+  padding: 14px var(--cardPad);
 }
-
 [aria-label="Rechtliches"] .section__body{
-  padding: 16px var(--cardPad);          /* weniger Innenabstand */
+  padding: 16px var(--cardPad);
   padding-top: 14px;
-  font-size: 13.5px;                      /* kleiner als Standard */
-  line-height: 1.5;                       /* kompakter */
+  font-size: 13.5px;
+  line-height: 1.5;
 }
-
 [aria-label="Rechtliches"] p{
-  color: rgba(255,255,255,.66);           /* wirkt “leichter” */
+  color: rgba(255,255,255,.66);
 }
-
 [aria-label="Rechtliches"] h3{
-  font-size: 14px;                        /* kleiner */
-  margin-top: 12px;                       /* weniger Abstand */
+  font-size: 14px;
+  margin-top: 12px;
 }
-
 [aria-label="Rechtliches"] .section__body p + p{
-  margin-top: 8px;                        /* weniger Absatzabstand */
+  margin-top: 8px;
 }
-
-/* Listen in Datenschutzerklärung kompakter */
 [aria-label="Rechtliches"] ul{
   margin-top: 8px;
   padding-left: 16px;
@@ -554,16 +546,12 @@ aside.card hr{ margin: 18px 0; }
 [aria-label="Rechtliches"] li{
   margin: 6px 0;
 }
-
-/* Links weniger “dominant” */
 [aria-label="Rechtliches"] a{
   border-bottom-color: rgba(255,255,255,.16);
 }
 [aria-label="Rechtliches"] a:hover{
   border-bottom-color: rgba(255,255,255,.30);
 }
-
-/* Mobile: noch etwas tighter */
 @media (max-width: 560px){
   [aria-label="Rechtliches"] .section__header{
     padding: 12px 16px;
@@ -574,103 +562,122 @@ aside.card hr{ margin: 18px 0; }
   }
 }
 
-/* ===== Contact block (balanced + a bit more present) ===== */
+/* ===== Kontakt (konsistent + balanced + gleiche Höhe Bild/Info) =====
+   Erwartetes Markup:
+   <section class="card section contact"> ... <div class="section__body">
+     <div class="contact__row">
+       <div class="contact__media"><img class="contact__img" ...></div>
+       <div class="contact__card">...</div>
+     </div>
+     <p class="contact__note">...</p>
+   </div>
+*/
 
-.section__body.contact{
-  gap: 18px;
+/* Kontakt-Section */
+.section.contact .section__body{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+/* 2-Spalten Layout */
 .contact__row{
   display: grid;
-  grid-template-columns: minmax(220px, 0.9fr) minmax(320px, 1.1fr);
+  grid-template-columns: minmax(200px, 0.95fr) minmax(280px, 1.25fr);
   gap: 18px;
-  align-items: center;
-  padding: 0 !important;
-  margin: 0;
+  align-items: stretch; /* => gleiche Höhe */
 }
-
 .contact__row > *{ min-width: 0; }
 
-.contact__portrait{
-  width: 100%;
+/* Bild-Wrapper */
+.contact__media,
+.contact__portraitWrap{ /* alias */
   height: 100%;
-  min-height: 180px;
-  object-fit: cover;
-
-  border-radius: 14px; /* weich, nicht verspielt */
-  border: 1px solid rgba(255,255,255,.14);
-
-  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  overflow: hidden;
+  background: rgba(0,0,0,.14);
+  box-shadow: 0 12px 32px rgba(0,0,0,.42);
 }
 
-.contact__info{
-  padding: 16px 18px;
+/* Bild */
+.contact__img,
+.contact__portrait{ /* alias */
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Info-Card */
+.contact__card,
+.contact__info{ /* alias */
+  height: 100%;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.10);
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.12);
+  padding: 16px 18px;
 
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  justify-content: center;
+  gap: 10px;
+
+  box-shadow: 0 12px 32px rgba(0,0,0,.32);
 }
 
+/* Typo */
 .contact__name{
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: rgba(255,255,255,.92);
   margin: 0;
-  line-height: 1.35;
+}
+.contact__role{
+  margin-top: -2px;
   font-size: 14px;
-  color: rgba(255,255,255,.82);
+  color: rgba(255,255,255,.70);
 }
 
-.contact__name strong{
-  font-size: 17px;           /* vorher zu groß */
-  color: rgba(255,255,255,.95);
-  letter-spacing: -0.01em;
-}
-
-.contact__info p{
-  margin: 0;
-  font-size: 13.5px;
-  color: rgba(255,255,255,.72);
-}
-
-.contact__info strong{
+/* Felder */
+.contact__field{ margin-top: 8px; }
+.contact__label{
+  font-weight: 800;
   color: rgba(255,255,255,.78);
-  font-weight: 600;
+  margin-bottom: 4px;
 }
+.contact__value{
+  display: inline-block;
+  color: rgba(255,255,255,.90);
+  border-bottom: 1px solid rgba(255,255,255,.22);
+  padding-bottom: 2px;
 
-.contact__info a{
-  display: inline-flex;
-  width: fit-content;
-  border-bottom-color: rgba(255,255,255,.28);
-}
-.contact a{
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-.contact small{
-  color: rgba(255,255,255,.60);
-  line-height: 1.45;
+/* Note */
+.contact__note,
+.section.contact .section__body > p:last-child{
+  color: rgba(255,255,255,.58);
+  margin: 0;
 }
 
-/* mobile: keep balance, avoid cramped */
-@media (max-width: 560px){
+/* Mobile */
+@media (max-width: 720px){
   .contact__row{
     grid-template-columns: 1fr;
     gap: 14px;
-    align-items: start;
   }
-  .contact__portrait{
-    width: 84px;
-    height: 84px;
+  .contact__media,
+  .contact__portraitWrap{
+    height: 320px;
   }
+  .contact__card,
   .contact__info{
-    padding: 10px 12px;
+    padding: 14px 14px;
   }
-  .contact__name strong{
-    font-size: 17px;
-  }
+  .contact__name{ font-size: 18px; }
 }
-
-
-
