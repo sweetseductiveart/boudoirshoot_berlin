@@ -576,8 +576,8 @@ aside.card hr{ margin: 18px 0; }
 
   display: grid;
 
-  /* left ~40% (clamped), right takes the rest */
-  grid-template-columns: clamp(220px, 40%, 360px) 1fr;
+  /* left ~35% (clamped), right takes the rest */
+  grid-template-columns: clamp(120px, 35%, 360px) 1fr;
 
   gap: 18px;
   align-items: stretch; /* IMPORTANT: make both columns same row height */
