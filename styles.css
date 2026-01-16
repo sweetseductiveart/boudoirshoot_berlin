@@ -582,10 +582,14 @@ aside.card hr{ margin: 18px 0; }
 
 .contact__row{
   display: grid;
-  grid-template-columns: 44% 56%;
-  gap: 20px;
-  align-items: stretch;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(320px, 1.1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 0 !important;
+  margin: 0;
 }
+
+.contact__row > *{ min-width: 0; }
 
 .contact__portrait{
   width: 100%;
@@ -639,6 +643,10 @@ aside.card hr{ margin: 18px 0; }
   width: fit-content;
   border-bottom-color: rgba(255,255,255,.28);
 }
+.contact a{
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 
 .contact small{
   color: rgba(255,255,255,.60);
@@ -648,7 +656,7 @@ aside.card hr{ margin: 18px 0; }
 /* mobile: keep balance, avoid cramped */
 @media (max-width: 560px){
   .contact__row{
-    grid-template-columns: 84px 1fr;
+    grid-template-columns: 1fr;
     gap: 14px;
     align-items: start;
   }
