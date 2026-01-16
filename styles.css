@@ -562,104 +562,115 @@ aside.card hr{ margin: 18px 0; }
   }
 }
 
-/* ===== Contact block (balanced, correct grid, rounded portrait) ===== */
+/* ===== Contact block (balanced, not too wide, equal height) ===== */
 
-/* optional: wenn du <div class="section__body stack contact"> nutzt */
 .section__body.contact{
   gap: 16px;
 }
 
-/* falls du die contact-Section über eine Klasse am Section/Panel markierst */
-.contact .section__body{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* 2-spaltig, aber NICHT zu breit – Bild : Text ~ 1 : 1.4 */
+/* Keep the contact row from becoming “too wide” inside the card */
 .contact__row{
+  /* center and cap width for nicer balance */
+  width: min(860px, 100%);
+  margin: 0 auto;
+
   display: grid;
-  grid-template-columns: minmax(220px, 0.95fr) minmax(320px, 1.35fr);
-  gap: 16px;
-  align-items: stretch;          /* => gleiche Höhe für Bild + rechte Box */
+
+  /* left ~40% (clamped), right takes the rest */
+  grid-template-columns: clamp(220px, 40%, 360px) 1fr;
+
+  gap: 18px;
+  align-items: stretch; /* IMPORTANT: make both columns same row height */
 }
 
-/* wichtig: Grid-Children dürfen schrumpfen (sonst „kleben“ / Overflow) */
+/* Prevent overflow issues in grid children */
 .contact__row > *{
   min-width: 0;
 }
 
-/* Portrait: wieder sauber abgerundet + Schatten + gleicher Stil wie Cards */
+/* Portrait: stable size + rounded + defines row height */
 .contact__portrait{
+  display: block;          /* avoids inline-image baseline weirdness */
   width: 100%;
-  height: 100%;
-  min-height: 240px;             /* sorgt dafür, dass rechts nicht höher wirkt */
+  height: auto;
+  aspect-ratio: 4 / 3;     /* gives a stable rectangle */
   object-fit: cover;
-  object-position: center;
-  display: block;
 
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.14);
-  box-shadow: 0 12px 32px rgba(0,0,0,.42);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
 }
 
-/* Rechte Info-Card: gleiche Höhe + Innenabstand konsistent */
+/* Info card: same height as portrait */
 .contact__info{
-  height: 100%;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.12);
-
+  height: 100%;            /* IMPORTANT: stretch to row height */
   padding: 16px 18px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.10);
+
   display: flex;
   flex-direction: column;
-  justify-content: center;       /* vertikal „balanced“ */
-  gap: 10px;
+  justify-content: center; /* visually balanced vs image */
+  gap: 12px;
 }
 
-/* Typo etwas weniger dominant (passt besser zum Rest) */
-.contact__info h3,
-.contact__info .contact__title{
+.contact__name{
   margin: 0;
-  line-height: 1.15;
-  font-size: 20px;
-}
-
-.contact__info .contact__subtitle{
-  margin: -4px 0 6px;
-  color: rgba(255,255,255,.70);
+  line-height: 1.35;
   font-size: 14px;
+  color: rgba(255,255,255,.82);
 }
 
-/* Links: dürfen umbrechen, aber nicht Layout sprengen */
+.contact__name strong{
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 900;
+  color: rgba(255,255,255,.95);
+  letter-spacing: -0.01em;
+}
+
+.contact__info p{
+  margin: 0;
+  font-size: 13.5px;
+  color: rgba(255,255,255,.72);
+}
+
+.contact__info strong{
+  color: rgba(255,255,255,.78);
+  font-weight: 700;
+}
+
+/* allow long mail addresses to wrap without breaking layout */
 .contact__info a{
   display: inline-block;
   max-width: 100%;
   overflow-wrap: anywhere;
   word-break: break-word;
+  border-bottom-color: rgba(255,255,255,.28);
 }
 
-/* Hinweistext unterhalb */
-.contact__note{
-  margin: 0;
-  color: rgba(255,255,255,.58);
+/* helper text */
+.section__body.contact small{
+  width: min(860px, 100%);
+  margin: 0 auto;
+  color: rgba(255,255,255,.60);
   line-height: 1.45;
 }
 
-/* Mobile: untereinander */
-@media (max-width: 720px){
+/* Mobile: stack, keep portrait as full-width rectangle */
+@media (max-width: 560px){
   .contact__row{
     grid-template-columns: 1fr;
     gap: 14px;
   }
-
   .contact__portrait{
-    min-height: 320px;
+    aspect-ratio: 16 / 10;
   }
-
   .contact__info{
     padding: 14px 14px;
+    justify-content: flex-start;
   }
 }
 
