@@ -574,46 +574,90 @@ aside.card hr{ margin: 18px 0; }
   }
 }
 
-/* ===== Contact block ===== */
+/* ===== Contact block (balanced + a bit more present) ===== */
 
-.contact{
-  gap: 16px;
+.section__body.contact{
+  gap: 18px;
 }
 
 .contact__row{
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 104px 1fr;   /* balanced columns */
+  gap: 18px;
+  align-items: center;               /* vertical balance */
 }
 
 .contact__portrait{
-  width: 72px;
-  height: 72px;
+  width: 104px;
+  height: 104px;
   border-radius: 999px;
   object-fit: cover;
   border: 1px solid rgba(255,255,255,.18);
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  box-shadow: 0 10px 26px rgba(0,0,0,.42);
   flex-shrink: 0;
 }
 
+/* give the info a subtle “card within card” to balance weight */
 .contact__info{
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.12);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .contact__name{
   margin: 0;
-  line-height: 1.4;
-  color: rgba(255,255,255,.92);
+  line-height: 1.25;
+  color: rgba(255,255,255,.94);
+  font-size: 16px;
 }
 
-/* Mobile: etwas mehr Luft */
+.contact__name strong{
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.contact__info p{
+  margin: 0;
+}
+
+/* make label + value visually tighter */
+.contact__info strong{
+  color: rgba(255,255,255,.86);
+}
+
+.contact__info a{
+  display: inline-flex;
+  width: fit-content;
+  border-bottom-color: rgba(255,255,255,.28);
+}
+
+.contact small{
+  color: rgba(255,255,255,.60);
+  line-height: 1.45;
+}
+
+/* mobile: keep balance, avoid cramped */
 @media (max-width: 560px){
+  .contact__row{
+    grid-template-columns: 84px 1fr;
+    gap: 14px;
+    align-items: start;
+  }
   .contact__portrait{
-    width: 64px;
-    height: 64px;
+    width: 84px;
+    height: 84px;
+  }
+  .contact__info{
+    padding: 10px 12px;
+  }
+  .contact__name strong{
+    font-size: 17px;
   }
 }
+
 
 
