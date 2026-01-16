@@ -582,51 +582,56 @@ aside.card hr{ margin: 18px 0; }
 
 .contact__row{
   display: grid;
-  grid-template-columns: 104px 1fr;   /* balanced columns */
-  gap: 18px;
-  align-items: center;               /* vertical balance */
+  grid-template-columns: 44% 56%;
+  gap: 20px;
+  align-items: stretch;
 }
 
 .contact__portrait{
-  width: 104px;
-  height: 104px;
-  border-radius: 999px;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
   object-fit: cover;
-  border: 1px solid rgba(255,255,255,.18);
-  box-shadow: 0 10px 26px rgba(0,0,0,.42);
-  flex-shrink: 0;
+
+  border-radius: 14px; /* weich, nicht verspielt */
+  border: 1px solid rgba(255,255,255,.14);
+
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
 }
 
-/* give the info a subtle “card within card” to balance weight */
 .contact__info{
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
   border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.12);
+  background: rgba(0,0,0,.10);
+
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .contact__name{
   margin: 0;
-  line-height: 1.25;
-  color: rgba(255,255,255,.94);
-  font-size: 16px;
+  line-height: 1.35;
+  font-size: 14px;
+  color: rgba(255,255,255,.82);
 }
 
 .contact__name strong{
-  font-size: 18px;
+  font-size: 17px;           /* vorher zu groß */
+  color: rgba(255,255,255,.95);
   letter-spacing: -0.01em;
 }
 
 .contact__info p{
   margin: 0;
+  font-size: 13.5px;
+  color: rgba(255,255,255,.72);
 }
 
-/* make label + value visually tighter */
 .contact__info strong{
-  color: rgba(255,255,255,.86);
+  color: rgba(255,255,255,.78);
+  font-weight: 600;
 }
 
 .contact__info a{
