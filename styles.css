@@ -574,3 +574,46 @@ aside.card hr{ margin: 18px 0; }
   }
 }
 
+/* ===== Contact block ===== */
+
+.contact{
+  gap: 16px;
+}
+
+.contact__row{
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.contact__portrait{
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  flex-shrink: 0;
+}
+
+.contact__info{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact__name{
+  margin: 0;
+  line-height: 1.4;
+  color: rgba(255,255,255,.92);
+}
+
+/* Mobile: etwas mehr Luft */
+@media (max-width: 560px){
+  .contact__portrait{
+    width: 64px;
+    height: 64px;
+  }
+}
+
+
