@@ -356,7 +356,7 @@
     </header>
 
     <div class="section__body stack contact">
-    <div class="contact__row">
+    <div class="contact__row" data-contact="dominik">
       <img
         src="assets/portrait.jpg"
         alt="Portrait Dominik Süß"
@@ -385,13 +385,12 @@
       </div>
     </div>
 
-    <div class="contact__row">
+    <div class="contact__row" data-contact="nale">
       <img
         src="assets/nale.jpg"
-        alt="Portrait Nale"
+        alt="Portrait NaLe"
         class="contact__portrait"
       />
-
       <div class="contact__info">
         <p class="contact__name">
           <strong>NaLe</strong><br>
@@ -555,6 +554,21 @@
   </section>
 </main>
 
+<!-- Contact Flyout Modal -->
+<div class="contact__flyout" id="contact-flyout" role="dialog" aria-modal="true" aria-labelledby="flyout-name" style="display: none;">
+  <div class="contact__flyout__overlay"></div>
+  <div class="contact__flyout__content">
+    <button class="contact__flyout__close" aria-label="Close">×</button>
+    <div class="contact__flyout__image">
+      <img id="flyout-portrait" src="" alt="" />
+    </div>
+    <div class="contact__flyout__details">
+      <p class="contact__name" id="flyout-name"></p>
+      <div id="flyout-info"></div>
+    </div>
+  </div>
+</div>
+
 <script>
   const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
   const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
@@ -622,6 +636,104 @@
 
   // Initial route
   routeFromHash();
+
+  // Contact Flyout Cards
+  const flyout = document.getElementById('contact-flyout');
+  const flyoutOverlay = flyout?.querySelector('.contact__flyout__overlay');
+  const flyoutClose = flyout?.querySelector('.contact__flyout__close');
+  const flyoutPortrait = document.getElementById('flyout-portrait');
+  const flyoutName = document.getElementById('flyout-name');
+  const flyoutInfo = document.getElementById('flyout-info');
+  const contactRows = document.querySelectorAll('.contact__row');
+
+  function openFlyout(row) {
+    const portrait = row.querySelector('.contact__portrait');
+    const info = row.querySelector('.contact__info');
+    
+    if (!portrait || !info || !flyout) return;
+
+    // Clone and set image
+    const imgSrc = portrait.getAttribute('src');
+    const imgAlt = portrait.getAttribute('alt') || '';
+    if (imgSrc && flyoutPortrait) {
+      flyoutPortrait.setAttribute('src', imgSrc);
+      flyoutPortrait.setAttribute('alt', imgAlt);
+    }
+
+    // Clone and set name
+    const nameHtml = info.querySelector('.contact__name')?.innerHTML || '';
+    if (flyoutName) {
+      flyoutName.innerHTML = nameHtml;
+    }
+
+    // Clone and set info (all paragraphs except name)
+    const infoParas = Array.from(info.querySelectorAll('p')).filter(p => !p.classList.contains('contact__name'));
+    if (flyoutInfo) {
+      flyoutInfo.innerHTML = infoParas.map(p => p.outerHTML).join('');
+    }
+
+    // Show flyout
+    flyout.style.display = 'flex';
+    // Trigger reflow for animation
+    requestAnimationFrame(() => {
+      flyout.classList.add('active');
+    });
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFlyout() {
+    if (!flyout) return;
+    
+    flyout.classList.remove('active');
+    
+    // Wait for animation before hiding
+    setTimeout(() => {
+      flyout.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 300);
+  }
+
+  // Open flyout on contact row click
+  contactRows.forEach(row => {
+    row.addEventListener('click', (e) => {
+      // Don't open if clicking on a link
+      if (e.target.closest('a')) return;
+      openFlyout(row);
+    });
+
+    // Add keyboard support
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('role', 'button');
+    row.setAttribute('aria-label', 'Open contact details');
+    row.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openFlyout(row);
+      }
+    });
+  });
+
+  // Close flyout on overlay click
+  if (flyoutOverlay) {
+    flyoutOverlay.addEventListener('click', closeFlyout);
+  }
+
+  // Close flyout on close button click
+  if (flyoutClose) {
+    flyoutClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeFlyout();
+    });
+  }
+
+  // Close flyout on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && flyout && flyout.classList.contains('active')) {
+      closeFlyout();
+    }
+  });
 </script>
 
 

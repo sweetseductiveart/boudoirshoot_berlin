@@ -568,7 +568,7 @@ aside.card hr{ margin: 18px 0; }
   gap: 16px;
 }
 
-/* Keep the contact row from becoming “too wide” inside the card */
+/* Keep the contact row from becoming "too wide" inside the card */
 .contact__row{
   /* center and cap width for nicer balance */
   width: min(860px, 100%);
@@ -581,6 +581,15 @@ aside.card hr{ margin: 18px 0; }
 
   gap: 18px;
   align-items: stretch; /* IMPORTANT: make both columns same row height */
+
+  /* Make clickable for flyout */
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.contact__row:hover{
+  opacity: 0.85;
+  transform: translateY(-2px);
 }
 
 /* Prevent overflow issues in grid children */
@@ -689,4 +698,202 @@ aside.card hr{ margin: 18px 0; }
     padding: 14px 14px;
   }
   .contact__name{ font-size: 18px; }
+}
+
+/* ===== Contact Flyout Modal ===== */
+
+.contact__flyout{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.contact__flyout[style*="display: block"],
+.contact__flyout.active{
+  display: flex !important;
+  opacity: 1;
+  visibility: visible;
+}
+
+.contact__flyout__overlay{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.contact__flyout__content{
+  position: relative;
+  z-index: 1001;
+  background: linear-gradient(180deg, var(--panelA) 0%, var(--panelB) 100%);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.contact__flyout.active .contact__flyout__content{
+  transform: scale(1);
+}
+
+.contact__flyout__image{
+  position: relative;
+  min-height: 400px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.contact__flyout__image img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.contact__flyout__details{
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.contact__flyout__details .contact__name{
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.contact__flyout__details .contact__name strong{
+  font-size: 28px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.contact__flyout__details p{
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255,255,255,.75);
+}
+
+.contact__flyout__details strong{
+  color: rgba(255,255,255,.88);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.contact__flyout__details a{
+  color: rgba(255,255,255,.85);
+  border-bottom-color: rgba(255,255,255,.32);
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.contact__flyout__details a:hover{
+  border-bottom-color: rgba(255,255,255,.6);
+  opacity: 1;
+}
+
+.contact__flyout__close{
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1002;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255,255,255,.9);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  padding: 0;
+}
+
+.contact__flyout__close:hover{
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255,255,255,.35);
+  transform: scale(1.1);
+}
+
+.contact__flyout__close:active{
+  transform: scale(0.95);
+}
+
+/* Mobile: Stack flyout content vertically */
+@media (max-width: 768px){
+  .contact__flyout__content{
+    grid-template-columns: 1fr;
+    max-height: 95vh;
+  }
+
+  .contact__flyout__image{
+    min-height: 300px;
+    max-height: 40vh;
+  }
+
+  .contact__flyout__details{
+    padding: 24px;
+    gap: 16px;
+  }
+
+  .contact__flyout__details .contact__name strong{
+    font-size: 24px;
+  }
+
+  .contact__flyout__details p{
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 560px){
+  .contact__flyout{
+    padding: 12px;
+  }
+
+  .contact__flyout__content{
+    border-radius: 18px;
+  }
+
+  .contact__flyout__details{
+    padding: 20px;
+  }
+
+  .contact__flyout__close{
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+    top: 12px;
+    right: 12px;
+  }
 }
