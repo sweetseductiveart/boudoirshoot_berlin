@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Offenes Studioshooting – Boudoir & Sensual | 28.03.2026</title>
+  <title data-i18n="title">Offenes Studioshooting – Boudoir & Sensual | 28.03.2026</title>
   <meta name="description" content="Offenes, kuratiertes Studioshooting (Boudoir & Sensual) im Fotostyle Berlin am 28.03.2026, 10–18 Uhr. Teilnahme als Fotograf–Model-Paar, optionale Kollaborationen." />
   <link rel="stylesheet" href="styles.css?v=2" />
+  <script src="i18n.js" defer></script>
 </head>
 
 <body>
@@ -13,18 +14,26 @@
 <header class="topbar">
   <div class="container topbar__inner">
     <div class="brand">
-      <strong>Boudoir &amp; Sensual – Offenes Studioshooting</strong>
-      <span>Fotostyle Berlin • Sa, 28.03.2026 • 10–18 Uhr</span>
+      <strong data-i18n="brand">Boudoir &amp; Sensual – Offenes Studioshooting</strong>
+      <span data-i18n="brandSubtitle">Fotostyle Berlin • Sa, 28.03.2026 • 10–18 Uhr</span>
     </div>
 
     <nav class="tabs" role="tablist" aria-label="Navigation">
-      <button class="tab" role="tab" aria-selected="true" aria-controls="tab-konzept" id="t-konzept">Konzept</button>
-      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-ablauf" id="t-ablauf">Ablauf</button>
-      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-location" id="t-location">Location</button>
-      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-divers" id="t-divers">Diversity</button>
-      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-codex" id="t-codex">Codex</button>
-      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-kosten" id="t-kosten">Kosten</button>
-      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-anmeldung" id="t-anmeldung">Anmeldung</button>
+      <button class="tab" role="tab" aria-selected="true" aria-controls="tab-konzept" id="t-konzept" data-i18n="navKonzept">Konzept</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-ablauf" id="t-ablauf" data-i18n="navAblauf">Ablauf</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-location" id="t-location" data-i18n="navLocation">Location</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-divers" id="t-divers" data-i18n="navDiversity">Diversity</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-codex" id="t-codex" data-i18n="navCodex">Codex</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-kosten" id="t-kosten" data-i18n="navKosten">Kosten</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-anmeldung" id="t-anmeldung" data-i18n="navAnmeldung">Anmeldung</button>
+      <div class="lang-switch" id="lang-switch-container" style="margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+        <span id="lang-label" data-i18n="heroLangLabel" style="font-weight: 500;">Sprache:</span>
+        <span id="lang-options" style="display: flex; gap: 6px; align-items: center;">
+          <span id="lang-de" style="font-weight: bold; cursor: default; color: #fff;">DE</span>
+          <span style="color: #aaa;">|</span>
+          <span id="lang-en" style="cursor: pointer; color: #aaa; transition: all 0.2s ease;" role="button" tabindex="0">EN</span>
+        </span>
+      </div>
     </nav>
   </div>
 </header>
@@ -36,22 +45,22 @@
     <div class="hero__shade" aria-hidden="true"></div>
 
     <header class="hero__content">
-      <div class="kicker"><span class="dot"></span> Kuratiertes Location-Sharing • Boudoir &amp; Sensual</div>
+      <div class="kicker"><span class="dot"></span> <span data-i18n="kicker">Kuratiertes Location-Sharing • Boudoir &amp; Sensual</span></div>
 
-      <h1>Offenes Studioshooting<br><span style="opacity:.92">Boudoir &amp; Sensual</span></h1>
+      <h1><span data-i18n="heroTitle">Offenes Studioshooting</span><br><span style="opacity:.92" data-i18n="heroSubtitle">Boudoir &amp; Sensual</span></h1>
       <p class="hero__note">
-        <strong>„Offen“ heißt:</strong> freie Motive &amp; Ideen (innerhalb unseres Kodex).<br>
-        <strong>Nicht:</strong> einfach vorbeikommen – Teilnahme nur nach Anmeldung &amp; Bestätigung.
+        <strong data-i18n="heroNoteStrong1">„Offen" heißt:</strong> <span data-i18n="heroNoteText1">freie Motive &amp; Ideen (innerhalb unseres Kodex).</span><br>
+        <strong data-i18n="heroNoteStrong2">Nicht:</strong> <span data-i18n="heroNoteText2">einfach vorbeikommen – Teilnahme nur nach Anmeldung &amp; Bestätigung.</span>
       </p>
       <div class="hero__meta">
-        <div class="pill"><strong>Kostenbeitrag:</strong>&nbsp;90 € / Paar</div>
-        <div class="pill"><strong>Plätze:</strong>&nbsp;min. 4 • max. 12 Paare</div>
-        <div class="pill"><strong>Sprache:</strong>&nbsp;DE / EN</div>
+        <div class="pill"><strong data-i18n="heroCostLabel">Kostenbeitrag:</strong>&nbsp;<span data-i18n="heroCost">90 € / Paar</span></div>
+        <div class="pill"><strong data-i18n="heroPlacesLabel">Plätze:</strong>&nbsp;<span data-i18n="heroPlaces">min. 4 • max. 12 Paare</span></div>
+        <div class="pill"><strong data-i18n="heroLangLabel">Sprache:</strong>&nbsp;<span data-i18n="heroLang">DE / EN</span></div>
       </div>
 
       <div class="btnrow">
-        <a class="btn btn--primary" href="#anmeldung" data-jump="tab-anmeldung">Zur Anmeldung</a>
-        <a class="btn btn--ghost" href="#konzept" data-jump="tab-konzept">Details</a>
+        <a class="btn btn--primary" href="#anmeldung" data-jump="tab-anmeldung" data-i18n="btnAnmeldung">Zur Anmeldung</a>
+        <a class="btn btn--ghost" href="#konzept" data-jump="tab-konzept" data-i18n="btnDetails">Details</a>
       </div>
     </header>
   </section>
@@ -65,12 +74,12 @@
       <!-- KONZEPT -->
       <section class="section" role="tabpanel" id="tab-konzept" aria-labelledby="t-konzept" data-active="true">
         <header class="section__header">
-          <h2>Konzept</h2>
-          <small>strukturiert • kollaborativ • hochwertig</small>
+          <h2 data-i18n="konzeptTitle">Konzept</h2>
+          <small data-i18n="konzeptSubtitle">strukturiert • kollaborativ • hochwertig</small>
         </header>
         <div class="section__body stack">
 
-          <p>
+          <p data-i18n-html="true" data-i18n="konzeptIntroP">
             Offenes, strukturiertes Studioshooting im Bereich <strong>Boudoir &amp; Sensual</strong>.
             Die Teilnahme erfolgt als festes Fotograf–Model-Kern-Pairing, um verlässliche Ergebnisse
             für alle Beteiligten sicherzustellen. Zusätzliche Kollaborationen sind ausdrücklich möglich.
@@ -78,8 +87,8 @@
 
           <div class="kv">
             <div class="item">
-              <strong>Kern-Pairing</strong>
-              <span>
+              <strong data-i18n="konzeptKernPairingTitle">Kern-Pairing</strong>
+              <span data-i18n="konzeptKernPairingText">
                 Jedes Paar entscheidet selbst, welchen Umfang an gemeinsamen Aufnahmen entstehen soll,
                 und stellt sicher, dass hierfür ausreichend Zeit eingeplant ist.
                 So entstehen verlässliche Ergebnisse – unabhängig von weiteren Shootings.
@@ -87,16 +96,16 @@
             </div>
 
             <div class="item">
-              <strong>Kollaborationen</strong>
-              <span>
+              <strong data-i18n="konzeptKollaborationenTitle">Kollaborationen</strong>
+              <span data-i18n="konzeptKollaborationenText">
                 Nachdem das eigene Kern-Pairing genügend Raum hatte, können zusätzliche Shootings
                 mit anderen Teilnehmenden flexibel und freiwillig in den Tagesablauf integriert werden.
               </span>
             </div>
 
             <div class="item">
-              <strong>Studios, Betten &amp; Sets</strong>
-              <span>
+              <strong data-i18n="konzeptStudiosTitle">Studios, Betten &amp; Sets</strong>
+              <span data-i18n="konzeptStudiosText">
                 Je nach Teilnehmerzahl werden ein bis drei Studios parallel genutzt.
                 Mit Studio&nbsp;3 stehen bis zu drei unterschiedliche Bett-Setups zur Verfügung.
                 Ergänzt wird dies durch weitere boudoir-taugliche Motive wie Couches, Sessel,
@@ -105,8 +114,8 @@
             </div>
 
             <div class="item">
-              <strong>Entspannter Ablauf</strong>
-              <span>
+              <strong data-i18n="konzeptEntspannterTitle">Entspannter Ablauf</strong>
+              <span data-i18n="konzeptEntspannterText">
                 Die Nutzung der Sets ist so organisiert, dass alle Teilnehmenden faire Chancen
                 auf beliebte Motive haben – mit klaren Absprachen und ohne Konkurrenzdruck.
               </span>
@@ -119,22 +128,22 @@
       <!-- ABLAUF -->
       <section class="section" role="tabpanel" id="tab-ablauf" aria-labelledby="t-ablauf" data-active="false">
         <header class="section__header">
-          <h2>Ablauf</h2>
-          <small>strukturiert • flexibel • fair</small>
+          <h2 data-i18n="ablaufTitle">Ablauf</h2>
+          <small data-i18n="ablaufSubtitle">strukturiert • flexibel • fair</small>
         </header>
         <div class="section__body stack">
-          <p>
+          <p data-i18n="ablaufIntro">
             Das Event ist als ganztägiges Studioshooting mit klarer Grundstruktur angelegt.
             Diese sorgt für Planungssicherheit und faire Set-Nutzung, lässt jedoch ausreichend
             Raum für spontane kreative Entscheidungen.
           </p>
 
           <ul>
-            <li><strong>Eventzeit:</strong> 10:00–18:00 Uhr</li>
-            <li>Je nach Teilnehmerzahl werden mehrere Studios parallel genutzt.</li>
-            <li>Beliebte Sets werden zeitlich koordiniert, um Überschneidungen zu vermeiden.</li>
-            <li><strong>Richtwert:</strong> ca. 60 Minuten ununterbrochene Nutzung pro Set.</li>
-            <li>Längere Nutzung ist möglich, sofern keine weitere Nachfrage besteht.</li>
+            <li data-i18n="ablaufLi1"><strong>Eventzeit:</strong> 10:00–18:00 Uhr</li>
+            <li data-i18n="ablaufLi2">Je nach Teilnehmerzahl werden mehrere Studios parallel genutzt.</li>
+            <li data-i18n="ablaufLi3">Beliebte Sets werden zeitlich koordiniert, um Überschneidungen zu vermeiden.</li>
+            <li data-i18n="ablaufLi4"><strong>Richtwert:</strong> ca. 60 Minuten ununterbrochene Nutzung pro Set.</li>
+            <li data-i18n="ablaufLi5">Längere Nutzung ist möglich, sofern keine weitere Nachfrage besteht.</li>
           </ul>
         </div>
       </section>
@@ -142,36 +151,36 @@
       <!-- LOCATION -->
       <section class="section" role="tabpanel" id="tab-location" aria-labelledby="t-location" data-active="false">
         <header class="section__header">
-          <h2>Mietstudio Fotostyle</h2>
-          <small>professionell • gut ausgestattet • Berlin-Lichtenberg</small>
+          <h2 data-i18n="locationTitle">Mietstudio Fotostyle</h2>
+          <small data-i18n="locationSubtitle">professionell • gut ausgestattet • Berlin-Lichtenberg</small>
         </header>
         <div class="section__body stack">
-          <p>
+          <p data-i18n-html="true" data-i18n="locationIntro">
             Das Event findet im <strong>Fotostyle Berlin</strong> statt – einem professionellen
             Mietstudio mit mehreren Räumen und einer Vielzahl an Sets für Boudoir- und Sensual-Fotografie.
           </p>
 
           <div class="kv">
             <div class="item">
-              <strong>Lage &amp; Erreichbarkeit</strong>
-              <span>
+              <strong data-i18n="lageTitle">Lage &amp; Erreichbarkeit</strong>
+              <span data-i18n="lageText">
                 Das Studio liegt im Osten Berlins in Lichtenberg und ist gut erreichbar.
                 Die genaue Adresse und Anfahrtsbeschreibung erhaltet ihr nach eurer Anmeldung.
               </span>
             </div>
 
             <div class="item">
-              <strong>Studio-Nutzung nach Teilnehmerzahl</strong>
+              <strong data-i18n="studioNutzungTitle">Studio-Nutzung nach Teilnehmerzahl</strong>
               <span>
-                <strong>4–6 Paare:</strong> Studio 1<br><br>
-                <strong>7–9 Paare:</strong> Studio 1 + Studio 4<br><br>
-                <strong>10–12 Paare:</strong> Studio 1 + Studio 4 + Studio 3
+                <strong data-i18n="studioNutzung4_6">4–6 Paare:</strong> <span data-i18n="studioNutzung4_6_text">Studio 1</span><br><br>
+                <strong data-i18n="studioNutzung7_9">7–9 Paare:</strong> <span data-i18n="studioNutzung7_9_text">Studio 1 + Studio 4</span><br><br>
+                <strong data-i18n="studioNutzung10_12">10–12 Paare:</strong> <span data-i18n="studioNutzung10_12_text">Studio 1 + Studio 4 + Studio 3</span>
               </span>
             </div>
 
             <div class="item">
-              <strong>Set-Reservierungen</strong>
-              <span>
+              <strong data-i18n="setReservierungenTitle">Set-Reservierungen</strong>
+              <span data-i18n-html="true" data-i18n="setReservierungenText">
                 Ihr könnt euch Zeitslots in den verschiedenen Setbereichen reservieren – jeweils maximal eine Stunde am Stück. 
                 Einige Slots sind vorab reservierbar, weitere freie Slots könnt ihr dann am Event-Tag vor Ort buchen.<br><br>
                 Detaillierte Informationen zu den verfügbaren Setbereichen und zum Reservierungsprozess erhaltet ihr einige Wochen vor dem Event.
@@ -179,24 +188,24 @@
             </div>
 
             <div class="item">
-              <strong>Sets &amp; Motive</strong>
-              <span>
+              <strong data-i18n="setsMotiveTitle">Sets &amp; Motive</strong>
+              <span data-i18n="setsMotiveText">
                 Jedes Studio bietet unterschiedliche Sets und Motive für Boudoir- und Sensual-Fotografie.
                 Ihr findet klassische Bett-Setups sowie weitere Szenerien: Couches, Sessel, Treppen, Duschen und architektonische Elemente.
               </span>
             </div>
 
             <div class="item">
-              <strong>Ausstattung &amp; Equipment</strong>
-              <span>
+              <strong data-i18n="aussstattungTitle">Ausstattung &amp; Equipment</strong>
+              <span data-i18n="aussstattungText">
                 Das Studio ist professionell ausgestattet mit Blitzanlage und diversen Lichtformern.
                 Bringt eure eigene Kameraausrüstung mit. Bei spezifischen Fragen zum verfügbaren Equipment kontaktiert uns gerne vorab.
               </span>
             </div>
 
             <div class="item">
-              <strong>Umkleide &amp; Sanitäranlagen</strong>
-              <span>
+              <strong data-i18n="umkleideTitle">Umkleide &amp; Sanitäranlagen</strong>
+              <span data-i18n="umkleideText">
                 Toiletten und Schminkbereiche mit Spiegeln sind vorhanden.
                 Separate Umkleidekabinen gibt es nicht, aber wir reservieren in jedem Studio einen privaten Bereich, 
                 in dem sich Models ungestört (ohne Fotografen) umziehen können.
@@ -204,8 +213,8 @@
             </div>
 
             <div class="item">
-              <strong>Parkplätze</strong>
-              <span>
+              <strong data-i18n="parkplaetzeTitle">Parkplätze</strong>
+              <span data-i18n="parkplaetzeText">
                 Kostenlos parken könnt ihr direkt vor dem Gebäude. Plant ausreichend Zeit für die Anreise ein.
               </span>
             </div>
@@ -284,7 +293,7 @@
           </div>
 
           <div class="notice">
-            <p>
+            <p data-i18n-html="true" data-i18n="locationNotice">
               <strong>Wichtig:</strong><br>
               Die genaue Adresse und detaillierte Anfahrtsbeschreibung erhaltet ihr nach erfolgreicher
               Anmeldung. Bei Fragen zur Location könnt ihr uns jederzeit kontaktieren.
@@ -304,16 +313,16 @@
       <!-- DIVERSITY -->
       <section class="section" role="tabpanel" id="tab-divers" aria-labelledby="t-divers" data-active="false">
         <header class="section__header">
-          <h2>Diversität &amp; Body Positivity</h2>
-          <small>inklusive Community</small>
+          <h2 data-i18n="diversityTitle">Diversität &amp; Body Positivity</h2>
+          <small data-i18n="diversitySubtitle">inklusive Community</small>
         </header>
         <div class="section__body stack">
-          <p>
+          <p data-i18n="diversityP1">
             Offen für alle Menschen – unabhängig von Geschlecht, Körperform, Hautfarbe
             oder ethnischem Hintergrund. Internationale Teilnehmende sind willkommen,
             sofern Kommunikation mindestens auf Englisch möglich ist.
           </p>
-          <p>
+          <p data-i18n="diversityP2">
             Wir möchten Body Positivity fördern und sinnliche Fotografie jenseits
             klassischer Schönheitsnormen sichtbar machen.
           </p>
@@ -323,12 +332,12 @@
       <!-- CODEX -->
       <section class="section" role="tabpanel" id="tab-codex" aria-labelledby="t-codex" data-active="false">
         <header class="section__header">
-          <h2>Codex &amp; Veröffentlichung</h2>
-          <small>sicher • respektvoll • verbindlich</small>
+          <h2 data-i18n="codexTitle">Codex &amp; Veröffentlichung</h2>
+          <small data-i18n="codexSubtitle">sicher • respektvoll • verbindlich</small>
         </header>
 
         <div class="section__body stack">
-          <p>
+          <p data-i18n="codexIntro">
             Wir legen großen Wert auf einen sicheren, respektvollen Rahmen.
             Der folgende Codex gilt für alle Teilnehmenden gleichermaßen.
             Ziel ist ein Safe Space, in dem sich alle wohl und sicher fühlen – ohne Druck, ohne Diskussionen.
@@ -336,32 +345,32 @@
 
           <div class="kv">
             <div class="item">
-              <strong>Consent: nur „Ja“ heißt Ja</strong>
-              <span>
+              <strong data-i18n="codexConsent1">Consent: nur „Ja" heißt Ja</strong>
+              <span data-i18n="codexConsent1Text">
                 Berührungen erfolgen ausschließlich nach expliziter Zustimmung (wo, wie, wie lange).
                 Zustimmung kann jederzeit geändert oder zurückgezogen werden – ohne Begründung.
               </span>
             </div>
 
             <div class="item">
-              <strong>Safe Space &amp; Privatsphäre</strong>
-              <span>
+              <strong data-i18n="codexSafeSpace1">Safe Space &amp; Privatsphäre</strong>
+              <span data-i18n="codexSafeSpace1Text">
                 Zuschauen bei Shootings anderer ist nur nach ausdrücklicher Einladung und Freigabe
                 durch Model und Fotograf:in gestattet. Keine ungefragten Kommentare oder Unterbrechungen.
               </span>
             </div>
 
             <div class="item">
-              <strong>TfP &amp; Vereinbarungen</strong>
-              <span>
+              <strong data-i18n="codexTfP1">TfP &amp; Vereinbarungen</strong>
+              <span data-i18n="codexTfP1Text">
                 Shootings erfolgen grundsätzlich auf TfP-Basis. Abweichende Vereinbarungen (z. B. Paid)
                 müssen direkt zwischen Fotograf:in und Model geklärt werden – unabhängig vom Event.
               </span>
             </div>
 
             <div class="item">
-              <strong>Model Release (Final Edits)</strong>
-              <span>
+              <strong data-i18n="codexModel1">Model Release (Final Edits)</strong>
+              <span data-i18n="codexModel1Text">
                 Vor jeder Veröffentlichung ist ein explizites Model Release auf Basis der final bearbeiteten Bilder erforderlich.
                 Eine Rohbild-/Vorauswahl ersetzt keine Freigabe der finalen Version.
               </span>
@@ -371,21 +380,21 @@
           <!-- Styled "wide card" block so the section below matches kv-cards -->
           <div class="codex-block">
             <div class="codex-card">
-              <strong>Inhalte &amp; Verhalten – was nicht toleriert wird</strong>
+              <strong data-i18n="codexBlockTitle">Inhalte &amp; Verhalten – was nicht toleriert wird</strong>
               <ul class="codex-list">
-                <li>
+                <li data-i18n-html="true" data-i18n="codexBlockLi1">
                   <strong>Nicht statthafte Inhalte:</strong> Politische, extremistisches, diskriminierende oder strafrechtlich relevante Inhalte sind ausgeschlossen.
                   Ebenfalls ausgeschlossen sind Darstellungen oder Handlungen, die gegen geltendes Recht verstoßen.
                 </li>
-                <li>
+                <li data-i18n-html="true" data-i18n="codexBlockLi2">
                   <strong>Druck/Übergriffigkeit:</strong> Jede Form von Belästigung, Nötigung, Manipulation oder „Überreden“ wird nicht akzeptiert.
                   Grenzen werden respektiert – ohne Diskussion.
                 </li>
-                <li>
+                <li data-i18n-html="true" data-i18n="codexBlockLi3">
                   <strong>Unsichere Umgebung:</strong> Teilnehmende, die durch Alkohol, Drogen oder vergleichbare Ursachen (z. B. starke emotionale Ausfallerscheinungen)
                   nicht mehr sicher, respektvoll oder verlässlich agieren können, gefährden den Safe Space.
                 </li>
-                <li>
+                <li data-i18n-html="true" data-i18n="codexBlockLi4">
                   <strong>Störungen:</strong> Wiederholtes Unterbrechen, ungefragtes Einmischen oder das Blockieren von Sets entgegen der Organisation
                   widerspricht dem Konzept und wird nicht toleriert.
                 </li>
@@ -394,7 +403,7 @@
           </div>
 
           <div class="notice">
-            <p>
+            <p data-i18n-html="true" data-i18n="codexEnforcement">
               <strong>Durchsetzung &amp; Ausschluss:</strong><br>
               Bei Verstößen gegen den Codex kann die Organisation Teilnehmende jederzeit vom Event ausschließen,
               um die Sicherheit und den respektvollen Rahmen für alle zu gewährleisten.
@@ -409,49 +418,49 @@
       <!-- KOSTEN -->
       <section class="section" role="tabpanel" id="tab-kosten" aria-labelledby="t-kosten" data-active="false">
         <header class="section__header">
-          <h2>Kosten</h2>
-          <small>transparent • fair • ohne Gewinnabsicht</small>
+          <h2 data-i18n="kostenTitle">Kosten</h2>
+          <small data-i18n="kostenSubtitle">transparent • fair • ohne Gewinnabsicht</small>
         </header>
 
         <div class="section__body stack">
           <div class="kv">
             <div class="item">
-              <strong>Maximalbetrag (Deckel)</strong>
-              <span><strong>90 €</strong> pro Fotograf–Model-Paar</span>
+              <strong data-i18n="kostenMaximal">Maximalbetrag (Deckel)</strong>
+              <span data-i18n="kostenMaximalValue"><strong>90 €</strong> pro Fotograf–Model-Paar</span>
             </div>
             <div class="item">
-              <strong>Wofür?</strong>
-              <span>Reine Umlage der Studio-Mietkosten (kein Workshop, kein Gewinn).</span>
+              <strong data-i18n="kostenWofuer">Wofür?</strong>
+              <span data-i18n="kostenWofuerText">Reine Umlage der Studio-Mietkosten (kein Workshop, kein Gewinn).</span>
             </div>
           </div>
 
-          <p>
+          <p data-i18n-html="true" data-i18n="kostenP1">
             Die Teilnahmegebühr dient <strong>ausschließlich der Deckung der Studio-Mietkosten</strong>.
             Es handelt sich <strong>nicht</strong> um eine Workshop- oder Event-Gebühr und
             es wird <strong>kein Gewinn</strong> erzielt.
           </p>
 
-          <p>
+          <p data-i18n-html="true" data-i18n="kostenP2">
             Der Betrag <strong>90 € pro Paar</strong> ist bewusst als <strong>Maximalbetrag</strong> kalkuliert –
             also für den <strong>ungünstigsten Fall</strong>, wenn wenige Paare teilnehmen und die fixen
             Kosten auf weniger Schultern verteilt werden müssen.
           </p>
 
-          <p>
+          <p data-i18n-html="true" data-i18n="kostenP3">
             Wenn mehr Paare teilnehmen, verteilt sich die Miete auf mehr Personen und der
             <strong>effektive Kostenbeitrag pro Paar sinkt</strong>.
             Das passiert jedoch <strong>nicht linear</strong>, weil ab bestimmten Teilnehmerzahlen
             zusätzliche Studios nötig werden.
           </p>
 
-          <p>
+          <p data-i18n-html="true" data-i18n="kostenP4">
             Nach finaler Planung und Durchführung des Events werden
             <strong>eventuelle Überschüsse anteilig zurückerstattet</strong>
             oder – nach Wunsch – als <strong>Guthaben für Folgeevents</strong> verrechnet.
           </p>
 
           <div class="notice">
-            <p>
+            <p data-i18n-html="true" data-i18n="kostenNotice">
               <strong>Kurz gesagt:</strong><br>
               Du zahlst vorab einen sicheren Maximalbetrag (<strong>90 €</strong>).
               Je mehr Paare teilnehmen, desto geringer fallen die tatsächlichen Kosten aus.
@@ -466,13 +475,13 @@
       <!-- ANMELDUNG -->
       <section class="section" role="tabpanel" id="tab-anmeldung" aria-labelledby="t-anmeldung" data-active="false">
         <header class="section__header">
-          <h2>Anmeldung</h2>
-          <small>first confirmed • first served</small>
+          <h2 data-i18n="anmeldungTitle">Anmeldung</h2>
+          <small data-i18n="anmeldungSubtitle">first confirmed • first served</small>
         </header>
         <div class="section__body stack">
 
           <div class="notice">
-            <p>
+            <p data-i18n-html="true" data-i18n="anmeldungNotice">
               <strong>Wichtig:</strong> Die Anmeldung ist zunächst eine Interessensbekundung.
               Nach kurzer Prüfung versenden wir die Zahlungsinformationen.
               Erst mit Zahlungseingang ist die Teilnahme verbindlich bestätigt.
@@ -495,17 +504,17 @@
   <!-- QUICK FACTS -->
   <section class="section">
     <header class="section__header">
-      <h2>Quick Facts</h2>
+      <h2 data-i18n="quickFactsTitle">Quick Facts</h2>
     </header>
     <div class="section__body stack">
-      <p>
+      <p data-i18n-html="true" data-i18n="quickFactsContent">
         <strong>Ort:</strong> Fotostyle Berlin<br>
         <strong>Datum:</strong> Sa, 28.03.2026<br>
         <strong>Zeit:</strong> 10:00–18:00<br>
         <strong>Kostenbeitrag:</strong> 90 € pro Fotograf–Model-Paar
       </p>
 
-      <small>
+      <small data-i18n="quickFactsSmall">
         Maximalbetrag zur Deckung der Studio-Mietkosten.<br>
         Eventuelle Überschüsse werden zurückerstattet oder gutgeschrieben.
       </small>
@@ -515,11 +524,11 @@
   <!-- WHATSAPP COMMUNITY -->
   <section class="section wa-community">
     <header class="section__header">
-      <h2>WhatsApp-Community</h2>
+      <h2 data-i18n="whatsappTitle">WhatsApp-Community</h2>
     </header>
 
     <div class="section__body stack">
-      <p>
+      <p data-i18n="whatsappText">
         Tritt unserer WhatsApp-Gruppe bei, um Updates, Termin-Infos
         und organisatorische Hinweise zum Event zu erhalten.
       </p>
@@ -537,10 +546,10 @@
           aria-hidden="true"
           class="wa-join__icon"
         />
-        <span>WhatsApp-Gruppe beitreten</span>
+        <span data-i18n="whatsappBtn">WhatsApp-Gruppe beitreten</span>
       </a>
 
-      <small>
+      <small data-i18n="whatsappSmall">
         Die Gruppe dient ausschließlich der Event-Kommunikation
         (keine Werbung, kein Spam).
       </small>
@@ -550,7 +559,7 @@
   <!-- KONTAKT -->
   <section class="section">
     <header class="section__header">
-      <h2>Kontakt</h2>
+      <h2 data-i18n="kontaktTitle">Kontakt</h2>
     </header>
 
     <div class="section__body stack contact">
@@ -565,18 +574,18 @@
       <div class="contact__info">
         <p class="contact__name">
           <strong>NaLe</strong><br>
-          Organisation & Model
+          <span data-i18n="kontaktNaLeRole">Organisation & Model</span>
         </p>
 
         <p>
-          <strong>E-Mail:</strong><br>
+          <strong data-i18n="kontaktEmailLabel">E-Mail:</strong><br>
           <a href="mailto:nale_2707@outlook.de">
             nale_2707@outlook.de
           </a>
         </p>
 
         <p>
-          <strong>Instagram:</strong><br>
+          <strong data-i18n="kontaktInstagramLabel">Instagram:</strong><br>
           <a href="https://instagram.com/nale_2707" target="_blank" rel="noopener">
             @nale_2707
           </a>
@@ -595,18 +604,18 @@
       <div class="contact__info">
         <p class="contact__name">
           <strong>Dominik Süß</strong><br>
-          Veranstalter & Fotograf
+          <span data-i18n="kontaktDominikRole">Veranstalter & Fotograf</span>
         </p>
 
         <p>
-          <strong>E-Mail:</strong><br>
+          <strong data-i18n="kontaktEmailLabel">E-Mail:</strong><br>
           <a href="mailto:sweetseductiveart@outlook.de">
             sweetseductiveart@outlook.de
           </a>
         </p>
 
         <p>
-          <strong>Instagram:</strong><br>
+          <strong data-i18n="kontaktInstagramLabel">Instagram:</strong><br>
           <a href="https://instagram.com/sweetseductiveart" target="_blank" rel="noopener">
             @sweetseductiveart
           </a>
@@ -614,7 +623,7 @@
       </div>
     </div>
 
-    <small>
+    <small data-i18n="kontaktSmall">
       Bei Fragen zum Ablauf, Codex oder zur Anmeldung erreicht ihr uns jederzeit gern vorab.
     </small>
   </div>
@@ -629,15 +638,15 @@
   <section class="card" aria-label="Rechtliches">
     <section class="section">
       <header class="section__header">
-        <h2>Impressum</h2>
+        <h2 data-i18n="impressumTitle">Impressum</h2>
       </header>
 
       <div class="section__body stack">
-        <p>
+        <p data-i18n="impressumIntro">
           Angaben gemäß § 5 TMG
         </p>
 
-        <p>
+        <p data-i18n-html="true" data-i18n="impressumCompany">
           <strong>Dominik Süß, Fotografie</strong><br>
           Inhaber: Dominik Süß<br>
           Aldanstraße 6<br>
@@ -645,12 +654,12 @@
           Deutschland
         </p>
 
-        <p>
+        <p data-i18n-html="true" data-i18n="impressumEmail">
           <strong>E-Mail:</strong><br>
           <a href="mailto:sweetseductiveart@outlook.de">sweetseductiveart@outlook.de</a>
         </p>
 
-        <p>
+        <p data-i18n-html="true" data-i18n="impressumResponsible">
           <strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong><br>
           Dominik Süß<br>
           Aldanstraße 6<br>
@@ -661,18 +670,18 @@
 
     <section class="section">
       <header class="section__header">
-        <h2>Datenschutzerklärung</h2>
+        <h2 data-i18n="datenschutzTitle">Datenschutzerklärung</h2>
       </header>
 
       <div class="section__body stack">
-        <p>
+        <p data-i18n="datenschutzIntro">
           Der Schutz deiner persönlichen Daten ist uns wichtig.
           Nachfolgend informieren wir darüber, welche personenbezogenen Daten im Rahmen
           dieser Website und der Event-Anmeldung verarbeitet werden und zu welchem Zweck.
         </p>
 
-        <h3>1. Verantwortlicher</h3>
-        <p>
+        <h3 data-i18n="datenschutzSection1">1. Verantwortlicher</h3>
+        <p data-i18n-html="true" data-i18n="datenschutzSection1Content">
           Verantwortlich für die Datenverarbeitung im Sinne der DSGVO ist:<br><br>
           <strong>Dominik Süß, Fotografie</strong><br>
           Inhaber: Dominik Süß<br>
@@ -683,8 +692,8 @@
           <a href="mailto:sweetseductiveart@outlook.de">sweetseductiveart@outlook.de</a>
         </p>
 
-        <h3>2. Zugriffsdaten / Hosting</h3>
-        <p>
+        <h3 data-i18n="datenschutzSection2">2. Zugriffsdaten / Hosting</h3>
+        <p data-i18n="datenschutzSection2Content1">
           Diese Website wird über GitHub Pages bereitgestellt.
           Beim Aufruf der Website werden durch GitHub technisch notwendige Zugriffsdaten
           (z. B. IP-Adresse, Datum und Uhrzeit des Zugriffs, Browsertyp)
@@ -692,19 +701,19 @@
           Auf diese Daten haben wir keinen direkten Zugriff.
         </p>
 
-        <p>
+        <p data-i18n="datenschutzSection2Content2">
           Weitere Informationen zur Datenverarbeitung durch GitHub findest du in der
           Datenschutzerklärung von GitHub.
         </p>
 
-        <h3>3. Event-Anmeldung über Microsoft Forms</h3>
-        <p>
+        <h3 data-i18n="datenschutzSection3">3. Event-Anmeldung über Microsoft Forms</h3>
+        <p data-i18n="datenschutzSection3Content1">
           Für die Anmeldung zum Event nutzen wir Microsoft Forms.
           Dabei werden die von dir eingegebenen Daten (z. B. Name, E-Mail-Adresse,
           Instagram- oder Portfolio-Links) an Microsoft übermittelt und dort verarbeitet.
         </p>
 
-        <p>
+        <p data-i18n-html="true" data-i18n="datenschutzSection3Content2">
           Die Verarbeitung erfolgt ausschließlich zum Zweck der Organisation,
           Kommunikation und Durchführung des Events.
           Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen)
@@ -712,40 +721,40 @@
           reibungslosen Event-Organisation).
         </p>
 
-        <p>
+        <p data-i18n="datenschutzSection3Content3">
           Weitere Informationen zur Datenverarbeitung durch Microsoft findest du in der
           Datenschutzerklärung von Microsoft.
         </p>
 
-        <h3>4. Kontaktaufnahme</h3>
-        <p>
+        <h3 data-i18n="datenschutzSection4">4. Kontaktaufnahme</h3>
+        <p data-i18n="datenschutzSection4Content">
           Wenn du uns per E-Mail oder über verlinkte Social-Media-Profile kontaktierst,
           werden die von dir übermittelten Daten ausschließlich zur Bearbeitung
           deiner Anfrage verwendet.
         </p>
 
-        <h3>5. Weitergabe von Daten</h3>
-        <p>
+        <h3 data-i18n="datenschutzSection5">5. Weitergabe von Daten</h3>
+        <p data-i18n="datenschutzSection5Content">
           Eine Weitergabe deiner personenbezogenen Daten an Dritte erfolgt nicht,
           sofern dies nicht zur Durchführung des Events erforderlich ist
           oder eine gesetzliche Verpflichtung besteht.
         </p>
 
-        <h3>6. Speicherdauer</h3>
-        <p>
+        <h3 data-i18n="datenschutzSection6">6. Speicherdauer</h3>
+        <p data-i18n="datenschutzSection6Content">
           Personenbezogene Daten werden nur so lange gespeichert,
           wie dies für die Organisation und Nachbereitung des Events erforderlich ist
           oder gesetzliche Aufbewahrungsfristen bestehen.
         </p>
 
-        <h3>7. Deine Rechte</h3>
-        <p>
+        <h3 data-i18n="datenschutzSection7">7. Deine Rechte</h3>
+        <p data-i18n="datenschutzSection7Content1">
           Du hast das Recht auf Auskunft über die von uns verarbeiteten personenbezogenen Daten,
           auf Berichtigung, Löschung oder Einschränkung der Verarbeitung,
           sowie ein Recht auf Widerspruch gegen die Verarbeitung.
         </p>
 
-        <p>
+        <p data-i18n="datenschutzSection7Content2">
           Zudem hast du das Recht auf Beschwerde bei einer zuständigen
           Datenschutzaufsichtsbehörde.
         </p>

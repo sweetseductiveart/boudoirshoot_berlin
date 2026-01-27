@@ -1,3 +1,5 @@
+// ===== LANGUAGE SWITCHER =====
+// Language switching is handled by i18n.js
 // ===== TAB SYSTEM: Main Navigation =====
 const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
 const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
