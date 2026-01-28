@@ -1108,28 +1108,15 @@ aside.card hr{ margin: 18px 0; }
 
 .gallery-thumbs {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 12px;
-  padding: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 14px;
+  padding: 14px;
   background: transparent;
 }
 
-/* iOS: deutlich vergrößerte Thumbnails */
-@supports (-webkit-touch-callout: none){
-  .gallery-thumbs {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
-    gap: 14px;
-    padding: 14px;
-  }
-  
-  .gallery-thumb {
-    min-width: 120px;
-    min-height: 120px;
-  }
-}
-
 .gallery-thumb {
-  width: 100%;
+  width: 100% !important;
+  height: auto !important;
   aspect-ratio: 1;
   border: 2px solid transparent;
   border-radius: 6px;
@@ -1138,6 +1125,7 @@ aside.card hr{ margin: 18px 0; }
   overflow: hidden;
   transition: all 0.2s ease;
   padding: 0;
+  display: block;
 }
 
 .gallery-thumb:hover {
@@ -1379,17 +1367,6 @@ aside.card hr{ margin: 18px 0; }
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-}
-
-/* Thumbnails */
-.gallery-thumbs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px;
-  padding: 0;
-  overflow: visible;
-  background: transparent;
-  border-top: none;
 }
 
 .gallery-thumbs::-webkit-scrollbar {
