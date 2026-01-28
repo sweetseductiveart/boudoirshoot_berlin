@@ -1033,7 +1033,8 @@ aside.card hr{ margin: 18px 0; }
   background: transparent;
   border: none;
   border-radius: var(--radius);
-  overflow: visible;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 
 .gallery-main {
@@ -1111,7 +1112,6 @@ aside.card hr{ margin: 18px 0; }
   gap: 12px;
   padding: 12px;
   background: transparent;
-  overflow: visible;
 }
 
 /* iOS: deutlich vergrößerte Thumbnails */
