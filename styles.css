@@ -1024,6 +1024,7 @@ aside.card hr{ margin: 18px 0; }
 .studio-tabs {
   width: 100%;
   margin-top: 20px;
+  margin-bottom: 24px;
 }
 
 .gallery-viewer {
@@ -1113,12 +1114,12 @@ aside.card hr{ margin: 18px 0; }
   overflow: visible;
 }
 
-/* iOS: vergrößerte Thumbnails */
+/* iOS: deutlich vergrößerte Thumbnails */
 @supports (-webkit-touch-callout: none){
   .gallery-thumbs {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-    padding: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    padding: 12px;
   }
 }
 
