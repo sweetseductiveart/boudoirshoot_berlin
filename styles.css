@@ -1117,9 +1117,14 @@ aside.card hr{ margin: 18px 0; }
 /* iOS: deutlich vergrößerte Thumbnails */
 @supports (-webkit-touch-callout: none){
   .gallery-thumbs {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 12px;
-    padding: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 14px;
+    padding: 14px;
+  }
+  
+  .gallery-thumb {
+    min-width: 120px;
+    min-height: 120px;
   }
 }
 
