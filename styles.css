@@ -1288,8 +1288,8 @@ aside.card hr{ margin: 18px 0; }
   transform: scale(1.5);
 }
 
-/* Navigation Buttons */
-.gallery-nav {
+/* Navigation Buttons - ONLY in modal */
+#gallery-zoom-modal .gallery-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -1308,21 +1308,21 @@ aside.card hr{ margin: 18px 0; }
   z-index: 10;
 }
 
-.gallery-nav:hover {
+#gallery-zoom-modal .gallery-nav:hover {
   background: rgba(255,255,255,.25);
   border-color: rgba(255,255,255,.35);
   transform: translateY(-50%) scale(1.1);
 }
 
-.gallery-nav:active {
+#gallery-zoom-modal .gallery-nav:active {
   transform: translateY(-50%) scale(0.95);
 }
 
-.gallery-nav--prev {
+#gallery-zoom-modal .gallery-nav--prev {
   left: 12px;
 }
 
-.gallery-nav--next {
+#gallery-zoom-modal .gallery-nav--next {
   right: 12px;
 }
 
