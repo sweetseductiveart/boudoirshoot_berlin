@@ -1,6 +1,7 @@
 {
   "name": "boudoir-event-site",
   "version": "1.0.0",
+  "type": "module",
   "description": "Boudoir & Sensual Offenes Studioshooting Event Website",
   "main": "index.html",
   "scripts": {

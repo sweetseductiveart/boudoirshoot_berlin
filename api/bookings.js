@@ -1,7 +1,7 @@
 // Vercel Serverless Function - GET /api/bookings
 // Liest alle Buchungen aus dem Master-Kalender
 
-const { google } = require('googleapis');
+import { google } from 'googleapis';
 
 // Service Account Credentials aus Environment Variables
 const getServiceAccountAuth = () => {
@@ -13,7 +13,7 @@ const getServiceAccountAuth = () => {
     });
 };
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
     // CORS Headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
