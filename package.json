@@ -7,8 +7,11 @@
     "test": "node tests/run.js",
     "test:regression": "node tests/run.js regression",
     "test:e2e": "node tests/run.js e2e",
-    "server": "python -m http.server 8000 --directory .",
-    "serve": "npm run server"
+    "server": "python -m http.server 8080 --directory .",
+    "serve": "npm run server",
+    "setup:create": "node setup-calendars-single.js",
+    "setup:transfer": "node setup-transfer-ownership.js",
+    "setup": "npm run setup:create && npm run setup:transfer"
   },
   "keywords": [
     "boudoir",
@@ -18,7 +21,13 @@
   ],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "googleapis": "^118.0.0"
+  },
   "devDependencies": {
-    "playwright": "^145.0.0"
+    "playwright": "^1.40.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }

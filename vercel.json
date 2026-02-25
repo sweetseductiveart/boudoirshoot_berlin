@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "env": {
+    "GOOGLE_SERVICE_ACCOUNT_KEY": "@google-service-account-key",
+    "MASTER_CALENDAR_ID": "@master-calendar-id"
+  }
+}

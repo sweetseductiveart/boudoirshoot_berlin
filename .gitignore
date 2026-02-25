@@ -20,3 +20,14 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# Vercel
+.vercel
+
+# Security - Service Account Credentials (NIEMALS einchecken!)
+service-account-key.json
+service-account-*.json
+.calendar-ids.json
+credentials.json
+token.json
+*-service-account-*.json
