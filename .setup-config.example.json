@@ -1,0 +1,18 @@
+{
+  "MASTER_CALENDAR_ID": "your-calendar-id-here@group.calendar.google.com",
+  "calendarName": "Studio Buchungen - 28. März 2026",
+  "calendarDescription": "Master-Kalender für alle Studios",
+  "timeZone": "Europe/Zurich",
+  "users": [
+    {
+      "email": "owner@example.com",
+      "name": "Owner Name",
+      "role": "owner"
+    },
+    {
+      "email": "user@example.com",
+      "name": "User Name",
+      "role": "reader"
+    }
+  ]
+}

@@ -37,5 +37,16 @@ token.json
 config/authorized-users.json
 config/authorized-users.unencrypted.json
 
+# Setup Configuration with PII (NIEMALS einchecken!)
+# Template: .setup-config.example.json (in repo für Referenz)
+# Actual config: .setup-config.json (lokal, mit E-Mails)
+.setup-config.json
+
 # Encryption utility output
 encrypt-config.log
+
+# Generated IDs und temporäre Dateien
+.calendar-id.json
+.calendar-ids.json
+credentials.json
+token.json
