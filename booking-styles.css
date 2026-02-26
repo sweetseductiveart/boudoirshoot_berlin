@@ -1445,6 +1445,7 @@ body {
         justify-content: flex-start;
         gap: 8px;
         flex-wrap: wrap;
+        padding-bottom: 0;
     }
 
     .bookings-table td::before {
