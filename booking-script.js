@@ -432,13 +432,9 @@ async function cancelPartnerBooking(eventId) {
         }
     };
     
-    if (booking.attendees && booking.attendees.length > 0) {
-        patch.attendees = booking.attendees;
-    } else if (props.userEmail) {
-        patch.attendees = [{ email: props.userEmail }];
-    }
-    
-    return updateBookingByEventId(eventId, patch, 'all');
+    // Note: sendUpdates 'none' to avoid Domain-Wide Delegation requirement
+    // Service account cannot send notifications without additional setup
+    return updateBookingByEventId(eventId, patch, 'none');
 }
 
 async function removePartnerByCreator(eventId) {
@@ -488,14 +484,10 @@ async function removePartnerByCreator(eventId) {
         }
     };
     
-    if (booking.attendees && booking.attendees.length > 0) {
-        patch.attendees = booking.attendees;
-    } else if (props.userEmail) {
-        patch.attendees = [{ email: props.userEmail }];
-    }
-    
     console.log('📤 Sending patch:', patch);
-    const result = await updateBookingByEventId(eventId, patch, 'all');
+    // Note: sendUpdates 'none' to avoid Domain-Wide Delegation requirement
+    // Service account cannot send notifications without additional setup
+    const result = await updateBookingByEventId(eventId, patch, 'none');
     console.log('📥 Update result:', result);
     return result;
 }
