@@ -632,8 +632,11 @@ function switchView(viewName) {
 }
 
 function updateURLHash() {
-    // Get current view
-    const activeView = document.querySelector('.nav-btn.active')?.dataset.view || 'overview';
+    // Get current view from active nav button
+    const activeBtn = document.querySelector('.nav-btn.active');
+    const activeView = activeBtn?.dataset?.view || 'overview';
+    
+    console.log('🔗 updateURLHash - activeView:', activeView, 'activeBtn:', activeBtn?.textContent);
     
     const params = new URLSearchParams();
     params.set('view', activeView);
@@ -648,14 +651,18 @@ function updateURLHash() {
     
     // Add user selection if in personal view
     if (activeView === 'personal') {
-        const selectedUser = document.getElementById('userSelect')?.value;
+        const userSelectElement = document.getElementById('userSelect');
+        const selectedUser = userSelectElement?.value;
+        console.log('👤 Personal view - userSelect element:', userSelectElement, 'selectedUser:', selectedUser);
         if (selectedUser) {
             params.set('user', selectedUser);
         }
     }
     
     // Update URL hash without triggering page reload
-    window.history.replaceState(null, '', '#' + params.toString());
+    const newHash = '#' + params.toString();
+    console.log('📝 Setting URL hash to:', newHash);
+    window.history.replaceState(null, '', newHash);
 }
 
 function restoreViewFromURL() {
@@ -1103,7 +1110,10 @@ function updatePersonalView() {
             </td>
         `;
         
-        row.querySelector('[data-action="details"]').addEventListener('click', () => showBookingModal(booking.id));
+        const detailsBtn = row.querySelector('[data-action="details"]');
+        if (detailsBtn) {
+            detailsBtn.addEventListener('click', () => showBookingModal(booking.id));
+        }
         const deleteBtn = row.querySelector('[data-action="delete"]');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', async () => await handleBookingAction('delete', booking));
