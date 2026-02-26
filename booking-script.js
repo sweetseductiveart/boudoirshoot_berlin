@@ -1181,100 +1181,131 @@ function updatePersonalView() {
     const selectedUser = getAuthorizedUserByEmail(selectedEmail);
     const selectedUserName = selectedUser?.name || '';
     
-    // Filter bookings where user is either the creator OR the partner
-    const userBookings = allBookings.filter(b => {
+    // Split bookings into own bookings (creator) and partner bookings
+    const ownBookings = [];
+    const partnerBookings = [];
+    
+    allBookings.forEach(b => {
         const props = b.extendedProperties?.private || {};
         const creatorEmail = getCreatorEmail(b, props);
         const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
         const isPartnerEmail = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail);
         const isPartnerName = props.partner === selectedUserName;
-        return isCreator || isPartnerEmail || isPartnerName;
+        
+        if (isCreator) {
+            ownBookings.push(b);
+        } else if (isPartnerEmail || isPartnerName) {
+            partnerBookings.push(b);
+        }
     });
     
-    if (userBookings.length === 0) {
+    if (ownBookings.length === 0 && partnerBookings.length === 0) {
         container.innerHTML = '<p class="no-data">Keine Buchungen vorhanden</p>';
         return;
     }
     
-    const table = document.createElement('table');
-    table.className = 'bookings-table';
-    
-    // Create table header
-    const thead = document.createElement('thead');
-    thead.innerHTML = `
-        <tr>
-            <th>Studio</th>
-            <th>Zeit</th>
-            <th>Dauer</th>
-            <th>Partner</th>
-            <th>Status</th>
-            <th>Aktion</th>
-        </tr>
-    `;
-    table.appendChild(thead);
-    
-    // Create table body
-    const tbody = document.createElement('tbody');
-    
-    const tableLabels = ['Studio', 'Zeit', 'Dauer', 'Partner', 'Status', 'Aktion'];
-
-    userBookings.forEach(booking => {
-        const props = booking.extendedProperties?.private || {};
-        const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
-        const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
-        const creatorEmail = getCreatorEmail(booking, props);
-        const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
-        const isAdmin = effectiveUser.isAdmin;
-        const isPartner = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
-        const isPartnerCanceled = isBookingPartnerCanceled(props);
-        const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
-        const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(effectiveUser.email) || isAdmin;
-        const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
-        const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
+    // Helper function to render a bookings table
+    const renderBookingsTable = (bookings, title, isOwnBookings) => {
+        if (bookings.length === 0) return null;
         
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><strong>${studio?.name || 'Unbekannt'}</strong></td>
-            <td>${startTime} Uhr</td>
-            <td>${props.duration} min</td>
-            <td>${props.partner || '-'}</td>
-            <td>${statusLabel}</td>
-            <td>${canShowActions ? `
-                <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
-                ${(isCreator || isAdmin) ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Löschen</button>` : ''}
-                ${canRemovePartner ? `<button class="btn btn-small btn-warning" data-action="remove-partner" data-event="${booking.id}">Partner entfernen</button>` : ''}
-                ${canCancelPartner ? `<button class="btn btn-small btn-warning" data-action="cancel-partner" data-event="${booking.id}">Partner stornieren</button>` : ''}
-            ` : '-'}
-            </td>
+        const section = document.createElement('div');
+        section.className = 'bookings-section';
+        
+        const sectionTitle = document.createElement('h3');
+        sectionTitle.textContent = title;
+        sectionTitle.style.marginTop = '20px';
+        sectionTitle.style.marginBottom = '10px';
+        section.appendChild(sectionTitle);
+        
+        const table = document.createElement('table');
+        table.className = 'bookings-table';
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+            <tr>
+                <th>Studio</th>
+                <th>Zeit</th>
+                <th>Dauer</th>
+                <th>${isOwnBookings ? 'Partner' : 'Gebucht von'}</th>
+                <th>Status</th>
+                <th>Aktion</th>
+            </tr>
         `;
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        const tableLabels = ['Studio', 'Zeit', 'Dauer', isOwnBookings ? 'Partner' : 'Gebucht von', 'Status', 'Aktion'];
 
-        Array.from(row.children).forEach((cell, index) => {
-            if (tableLabels[index]) {
-                cell.setAttribute('data-label', tableLabels[index]);
+        bookings.forEach(booking => {
+            const props = booking.extendedProperties?.private || {};
+            const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
+            const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
+            const creatorEmail = getCreatorEmail(booking, props);
+            const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
+            const isAdmin = effectiveUser.isAdmin;
+            const isPartner = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
+            const isPartnerCanceled = isBookingPartnerCanceled(props);
+            const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
+            const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(effectiveUser.email) || isAdmin;
+            const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
+            const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
+            
+            // For partner bookings, show who booked them
+            const partnerOrCreatorDisplay = isOwnBookings 
+                ? (props.partner || '-')
+                : (getDisplayNameByEmail(creatorEmail) || creatorEmail);
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td data-label="${tableLabels[0]}"><strong>${studio?.name || 'Unbekannt'}</strong></td>
+                <td data-label="${tableLabels[1]}">${startTime} Uhr</td>
+                <td data-label="${tableLabels[2]}">${props.duration} min</td>
+                <td data-label="${tableLabels[3]}">${partnerOrCreatorDisplay}</td>
+                <td data-label="${tableLabels[4]}">${statusLabel}</td>
+                <td data-label="${tableLabels[5]}">${canShowActions ? `
+                    <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
+                    ${(isCreator || isAdmin) ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Löschen</button>` : ''}
+                    ${canRemovePartner ? `<button class="btn btn-small btn-warning" data-action="remove-partner" data-event="${booking.id}">Partner entfernen</button>` : ''}
+                    ${canCancelPartner ? `<button class="btn btn-small btn-warning" data-action="cancel-partner" data-event="${booking.id}">Partner stornieren</button>` : ''}
+                ` : '-'}
+                </td>
+            `;
+            
+            const detailsBtn = row.querySelector('[data-action="details"]');
+            if (detailsBtn) {
+                detailsBtn.addEventListener('click', () => showBookingModal(booking.id));
             }
+            const deleteBtn = row.querySelector('[data-action="delete"]');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', async () => await handleBookingAction('delete', booking));
+            }
+            const removeBtn = row.querySelector('[data-action="remove-partner"]');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', async () => await handleBookingAction('remove-partner', booking));
+            }
+            const cancelBtn = row.querySelector('[data-action="cancel-partner"]');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', async () => await handleBookingAction('cancel-partner', booking));
+            }
+            
+            tbody.appendChild(row);
         });
         
-        const detailsBtn = row.querySelector('[data-action="details"]');
-        if (detailsBtn) {
-            detailsBtn.addEventListener('click', () => showBookingModal(booking.id));
-        }
-        const deleteBtn = row.querySelector('[data-action="delete"]');
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', async () => await handleBookingAction('delete', booking));
-        }
-        const removeBtn = row.querySelector('[data-action="remove-partner"]');
-        if (removeBtn) {
-            removeBtn.addEventListener('click', async () => await handleBookingAction('remove-partner', booking));
-        }
-        const cancelBtn = row.querySelector('[data-action="cancel-partner"]');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', async () => await handleBookingAction('cancel-partner', booking));
-        }
-        tbody.appendChild(row);
-    });
+        table.appendChild(tbody);
+        section.appendChild(table);
+        return section;
+    };
     
-    table.appendChild(tbody);
-    container.appendChild(table);
+    // Render own bookings
+    const ownSection = renderBookingsTable(ownBookings, 'Meine Buchungen', true);
+    if (ownSection) container.appendChild(ownSection);
+    
+    // Render partner bookings
+    const partnerSection = renderBookingsTable(partnerBookings, 'Als Partner gebucht', false);
+    if (partnerSection) container.appendChild(partnerSection);
 }
 
 function updateStudioView() {
@@ -1437,11 +1468,15 @@ function showBookingModal(eventId) {
         `;
     }
     
+    const creatorUser = getAuthorizedUserByEmail(creatorEmail);
+    const creatorName = creatorUser?.name || creatorEmail;
+    const creatorRole = creatorUser?.role || 'Fotograf/in';
+    
     body.innerHTML = `
         <p><strong>Studio:</strong> ${studio?.name}</p>
         <p><strong>Zeit:</strong> ${startTime}</p>
         <p><strong>Dauer:</strong> ${props.duration} Minuten</p>
-        <p><strong>Fotograf/in:</strong> ${props.userEmail}</p>
+        <p><strong>${creatorRole}:</strong> ${creatorName}</p>
         ${partnerUI}
         <p><strong>Status:</strong> ${statusLabel}</p>
         <p><strong>Notizen:</strong> ${sanitizeNotesDescription(booking.description) || '-'}</p>
