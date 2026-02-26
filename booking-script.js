@@ -109,9 +109,13 @@ async function restoreSessionFromStorage() {
             }
             
             const user = JSON.parse(savedUser);
+            const authorizedUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => normalizeEmail(u.email) === normalizeEmail(user.email));
             
             // Restore user session
-            currentUser = user;
+            currentUser = {
+                ...user,
+                name: authorizedUser?.name || user.name
+            };
             
             console.log('✅ Session restored from storage:', user.email);
             
@@ -200,12 +204,11 @@ async function handleGoogleSignIn(response) {
     // Decode JWT token to get user info
     const payload = parseJwt(response.credential);
     const email = payload.email;
-    const name = payload.name;
     
     console.log('👤 User logged in:', email);
     
     // Check authorization
-    const authorizedUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => u.email === email);
+    const authorizedUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => normalizeEmail(u.email) === normalizeEmail(email));
     
     if (!authorizedUser) {
         showError('loginError', `Ihr Google-Account (${email}) ist nicht autorisiert. Kontaktieren Sie den Administrator.`);
@@ -215,7 +218,7 @@ async function handleGoogleSignIn(response) {
     // Store user
     currentUser = {
         email: email,
-        name: name,
+        name: authorizedUser?.name || payload.name,
         picture: payload.picture
     };
     
@@ -396,9 +399,36 @@ function getPartnerStatusLabel(props) {
     return props.partnerCanceledByRole === 'creator' ? 'Partner entfernt' : 'Partner storniert';
 }
 
+function normalizeEmail(email) {
+    return (email || '').trim().toLowerCase();
+}
+
+function getAuthorizedUserByEmail(email) {
+    return BOOKING_CONFIG.AUTHORIZED_USERS.find(u => normalizeEmail(u.email) === normalizeEmail(email));
+}
+
+function getCurrentUserRecord() {
+    return getAuthorizedUserByEmail(currentUser?.email);
+}
+
+function isCurrentUserAdmin() {
+    const record = getCurrentUserRecord();
+    return record?.isAdmin === true;
+}
+
+function getDisplayNameByEmail(email) {
+    return getAuthorizedUserByEmail(email)?.name || email || '';
+}
+
+function getCreatorEmail(booking, props) {
+    return props.userEmail || booking?.creator?.email || booking?.organizer?.email || '';
+}
+
 function isCurrentUserPartner(props) {
     if (!currentUser) return false;
-    return props.partnerEmail === currentUser.email || props.partner === currentUser.name;
+    const currentEmail = normalizeEmail(currentUser.email);
+    const currentName = getDisplayNameByEmail(currentUser.email) || currentUser.name;
+    return normalizeEmail(props.partnerEmail) === currentEmail || props.partner === currentName || props.partner === currentUser.name;
 }
 
 function buildPartnerCancelDescription(existingDescription, partnerName, canceledAt, label = 'Partner storniert') {
@@ -454,6 +484,16 @@ function setPartnerInSummary(summary, newPartner) {
 
 function getBookingDisplayLabel(booking) {
     const props = booking.extendedProperties?.private || {};
+    const creatorEmail = getCreatorEmail(booking, props);
+    const creatorName = getDisplayNameByEmail(creatorEmail);
+    const partnerName = isBookingPartnerCanceled(props)
+        ? ''
+        : (getDisplayNameByEmail(props.partnerEmail) || props.partner || '');
+
+    if (creatorName || partnerName) {
+        return [creatorName, partnerName].filter(Boolean).join(' & ');
+    }
+
     const displaySummary = isBookingPartnerCanceled(props)
         ? setPartnerInSummary(booking.summary, '')
         : booking.summary;
@@ -1060,7 +1100,9 @@ function updatePersonalView() {
     // Filter bookings where user is either the creator OR the partner
     const userBookings = allBookings.filter(b => {
         const props = b.extendedProperties?.private || {};
-        const isCreator = props.userEmail === selectedEmail;
+        const creatorEmail = getCreatorEmail(booking, props);
+        const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
+        const isAdmin = isCurrentUserAdmin();
         const isPartnerEmail = props.partnerEmail === selectedEmail;
         const isPartnerName = props.partner === selectedUserName;
         return isCreator || isPartnerEmail || isPartnerName;
@@ -1098,12 +1140,12 @@ function updatePersonalView() {
         const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
         const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
         const isCreator = props.userEmail === selectedEmail;
-        const isPartner = props.partnerEmail === selectedEmail || props.partner === selectedUserName;
+        const isPartner = normalizeEmail(props.partnerEmail) === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
         const isPartnerCanceled = isBookingPartnerCanceled(props);
         const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
         const canShowActions = selectedEmail === currentUser?.email;
-        const canRemovePartner = isCreator && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
-        const canCancelPartner = !isCreator && isPartner && !isPartnerCanceled;
+        const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
+        const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
         
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -1114,7 +1156,7 @@ function updatePersonalView() {
             <td>${statusLabel}</td>
             <td>${canShowActions ? `
                 <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
-                ${isCreator ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Loeschen</button>` : ''}
+                ${(isCreator || isAdmin) ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Loeschen</button>` : ''}
                 ${canRemovePartner ? `<button class="btn btn-small btn-warning" data-action="remove-partner" data-event="${booking.id}">Partner entfernen</button>` : ''}
                 ${canCancelPartner ? `<button class="btn btn-small btn-warning" data-action="cancel-partner" data-event="${booking.id}">Partner stornieren</button>` : ''}
             ` : '-'}
@@ -1274,7 +1316,9 @@ function showBookingModal(eventId) {
     const props = booking.extendedProperties?.private || {};
     const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
     const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
-    const isCreator = props.userEmail === currentUser?.email;
+    const creatorEmail = getCreatorEmail(booking, props);
+    const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(currentUser?.email);
+    const isAdmin = isCurrentUserAdmin();
     const isPartner = isCurrentUserPartner(props);
     const isPartnerCanceled = isBookingPartnerCanceled(props);
     const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
@@ -1288,7 +1332,7 @@ function showBookingModal(eventId) {
     
     // Build partner selection UI (only for creator if partner is removed/empty)
     let partnerUI = `<p><strong>Partner:</strong> ${currentPartnerName || '-'}</p>`;
-    if (isCreator && isPartnerCanceled) {
+    if ((isCreator || isAdmin) && isPartnerCanceled) {
         const partnerOptions = BOOKING_CONFIG.AUTHORIZED_USERS
             .filter(u => u.email !== props.userEmail)
             .map(u => `<option value="${u.email}">${u.name}</option>`)
@@ -1317,14 +1361,14 @@ function showBookingModal(eventId) {
     
     const deleteBtn = document.getElementById('deleteBooking');
     deleteBtn.dataset.eventId = eventId;
-    deleteBtn.classList.toggle('hidden', !isCreator);
+    deleteBtn.classList.toggle('hidden', !(isCreator || isAdmin));
     
     const cancelBtn = document.getElementById('cancelPartner');
     cancelBtn.dataset.eventId = eventId;
-    const canRemovePartner = isCreator && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
-    const canCancelPartner = !isCreator && isPartner && !isPartnerCanceled;
+    const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
+    const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
     if (canRemovePartner || canCancelPartner) {
-        cancelBtn.textContent = isCreator ? 'Partner entfernen' : 'Partner stornieren';
+        cancelBtn.textContent = (isCreator || isAdmin) ? 'Partner entfernen' : 'Partner stornieren';
         cancelBtn.classList.remove('hidden');
     } else {
         cancelBtn.classList.add('hidden');
@@ -1334,7 +1378,7 @@ function showBookingModal(eventId) {
     const confirmBtn = document.getElementById('confirmNewPartner');
     if (confirmBtn) {
         confirmBtn.dataset.eventId = eventId;
-        confirmBtn.classList.toggle('hidden', !(isCreator && isPartnerCanceled));
+        confirmBtn.classList.toggle('hidden', !((isCreator || isAdmin) && isPartnerCanceled));
     }
     
     modal.classList.remove('hidden');
@@ -1566,11 +1610,12 @@ async function submitNewBooking() {
     const endDate = addMinutes(eventDate, duration);
     
     // Get partner name from email
-    const partnerUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => u.email === partnerEmail);
+    const partnerUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => normalizeEmail(u.email) === normalizeEmail(partnerEmail));
     const partnerName = partnerUser?.name || '';
+    const creatorName = getDisplayNameByEmail(currentUser.email) || currentUser.name;
     
     const event = {
-        summary: `${studio.name} - ${currentUser.name}${partnerName ? ' & ' + partnerName : ''}`,
+        summary: `${studio.name} - ${creatorName}${partnerName ? ' & ' + partnerName : ''}`,
         description: notes || undefined,
         start: {
             dateTime: eventDate.toISOString(),
@@ -1583,7 +1628,7 @@ async function submitNewBooking() {
         extendedProperties: {
             private: {
                 studioId: studio.id,
-                userEmail: currentUser.email,
+                userEmail: normalizeEmail(currentUser.email),
                 duration: duration.toString(),
                 partner: partnerName,
                 partnerEmail: partnerEmail,
