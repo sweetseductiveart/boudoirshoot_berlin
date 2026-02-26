@@ -1100,10 +1100,9 @@ function updatePersonalView() {
     // Filter bookings where user is either the creator OR the partner
     const userBookings = allBookings.filter(b => {
         const props = b.extendedProperties?.private || {};
-        const creatorEmail = getCreatorEmail(booking, props);
+        const creatorEmail = getCreatorEmail(b, props);
         const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
-        const isAdmin = isCurrentUserAdmin();
-        const isPartnerEmail = props.partnerEmail === selectedEmail;
+        const isPartnerEmail = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail);
         const isPartnerName = props.partner === selectedUserName;
         return isCreator || isPartnerEmail || isPartnerName;
     });
@@ -1139,8 +1138,9 @@ function updatePersonalView() {
         const props = booking.extendedProperties?.private || {};
         const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
         const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
-        const isCreator = props.userEmail === selectedEmail;
-        const isPartner = normalizeEmail(props.partnerEmail) === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
+        const isCreator = normalizeEmail(props.userEmail) === normalizeEmail(selectedEmail);
+        const isAdmin = isCurrentUserAdmin();
+        const isPartner = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
         const isPartnerCanceled = isBookingPartnerCanceled(props);
         const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
         const canShowActions = selectedEmail === currentUser?.email;
