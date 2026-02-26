@@ -852,6 +852,7 @@ function updateOverviewView() {
             const studioHeader = document.createElement('div');
             studioHeader.className = 'mobile-studio-header';
             studioHeader.style.borderTopColor = currentStudio.color;
+            studioHeader.style.backgroundColor = currentStudio.color + '08';
             studioHeader.textContent = currentStudio.name;
             studioColumn.appendChild(studioHeader);
             
