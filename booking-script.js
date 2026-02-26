@@ -423,6 +423,38 @@ function stripPartnerFromSummary(summary, partnerName) {
     return summary.replace(new RegExp(`\\s*[&+]\\s*${escapedPartner}$`), '').trim();
 }
 
+function stripPartnerFromPeopleLine(peopleLine, partnerName) {
+    if (!peopleLine || !partnerName) return peopleLine;
+    const escapedPartner = partnerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return peopleLine.replace(new RegExp(`\\s*[&+]\\s*${escapedPartner}$`), '').trim();
+}
+
+function replacePartnerInSummary(summary, oldPartner, newPartner) {
+    if (!summary) return summary;
+    if (!oldPartner && !newPartner) return summary;
+    const parts = summary.split(' - ');
+    if (parts.length < 2) {
+        const cleaned = oldPartner ? stripPartnerFromSummary(summary, oldPartner) : summary;
+        return newPartner ? `${cleaned} & ${newPartner}` : cleaned;
+    }
+    const peopleLine = parts.pop();
+    const cleanedPeople = oldPartner ? stripPartnerFromPeopleLine(peopleLine, oldPartner) : peopleLine;
+    const finalPeople = newPartner ? (cleanedPeople ? `${cleanedPeople} & ${newPartner}` : newPartner) : cleanedPeople;
+    if (!finalPeople) return parts.join(' - ');
+    return `${parts.join(' - ')} - ${finalPeople}`;
+}
+
+function getBookingDisplayLabel(booking) {
+    const props = booking.extendedProperties?.private || {};
+    const partnerName = isBookingPartnerCanceled(props)
+        ? (props.partnerCanceledByName || props.partner || '')
+        : (props.partner || '');
+    const cleanedSummary = partnerName
+        ? replacePartnerInSummary(booking.summary, partnerName, isBookingPartnerCanceled(props) ? '' : partnerName)
+        : booking.summary;
+    return cleanedSummary.split(' - ').slice(1).join(' - ');
+}
+
 async function cancelPartnerBooking(eventId) {
     const booking = allBookings.find(b => b.id === eventId);
     if (!booking) return false;
@@ -443,7 +475,7 @@ async function cancelPartnerBooking(eventId) {
     if (!confirmed) return false;
     
     const canceledAt = new Date().toLocaleString('de-DE');
-    const updatedSummary = stripPartnerFromSummary(booking.summary, props.partner);
+    const updatedSummary = replacePartnerInSummary(booking.summary, props.partner, '');
     const patch = {
         summary: updatedSummary,
         description: buildPartnerCancelDescription(booking.description, props.partner, canceledAt, 'Partner storniert'),
@@ -499,7 +531,7 @@ async function removePartnerByCreator(eventId) {
     }
     
     const canceledAt = new Date().toLocaleString('de-DE');
-    const updatedSummary = stripPartnerFromSummary(booking.summary, props.partner);
+    const updatedSummary = replacePartnerInSummary(booking.summary, props.partner, '');
     const patch = {
         summary: updatedSummary,
         description: buildPartnerCancelDescription(booking.description, props.partner, canceledAt, 'Partner entfernt'),
@@ -825,7 +857,7 @@ function updateOverviewView() {
                     if (slot === bookingStartTime) {
                         const statusLabel = getPartnerStatusLabel(props);
                         const statusLine = statusLabel ? `<div class="booking-status">${statusLabel}</div>` : '';
-                        cell.innerHTML = `<div class="booking-label">${booking.summary.split(' - ').slice(1).join(' - ')} (${duration}min)</div>${statusLine}`;
+                        cell.innerHTML = `<div class="booking-label">${getBookingDisplayLabel(booking)} (${duration}min)</div>${statusLine}`;
                     } else {
                         // Continuation of booking - show arrow
                         cell.innerHTML = `<div class="booking-label" style="font-size: 18px; opacity: 0.7;">↑</div>`;
@@ -969,7 +1001,7 @@ function updateOverviewView() {
                         const statusLine = statusLabel ? `<div class="booking-status">${statusLabel}</div>` : '';
                         cell.innerHTML = `
                             <div class="booking-block">
-                                <div class="booking-title">${booking.summary.split(' - ').slice(1).join(' - ')}</div>
+                                <div class="booking-title">${getBookingDisplayLabel(booking)}</div>
                                 <div class="booking-time">${slot} (${duration}min)</div>
                                 ${statusLine}
                             </div>
@@ -1145,7 +1177,7 @@ function updateStudioView() {
             if (slot === bookingStartTime) {
                 const statusLabel = getPartnerStatusLabel(props);
                 const statusLine = statusLabel ? `<br><small>${statusLabel}</small>` : '';
-                content = `<strong>${slot}</strong> (${duration}min)<br><small>${booking.summary.split(' - ').slice(1).join(' - ')}</small>${statusLine}`;
+                content = `<strong>${slot}</strong> (${duration}min)<br><small>${getBookingDisplayLabel(booking)}</small>${statusLine}`;
                 
                 // Add duration class for 60min bookings
                 if (duration === 60) {
@@ -1309,10 +1341,8 @@ async function confirmNewPartner() {
     const updatedDescription = sanitizeNotesDescription(booking.description || '');
 
     // Update summary to reflect current partner selection
-    let updatedSummary = stripPartnerFromSummary(booking.summary, props.partner);
-    if (newPartnerName) {
-        updatedSummary = `${updatedSummary} & ${newPartnerName}`;
-    }
+    const previousPartner = props.partner || props.partnerCanceledByName || '';
+    const updatedSummary = replacePartnerInSummary(booking.summary, previousPartner, newPartnerName);
     
     const patch = {
         summary: updatedSummary,
