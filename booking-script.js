@@ -1094,7 +1094,7 @@ function updatePersonalView() {
     container.innerHTML = '';
     
     // Find the selected user's name
-    const selectedUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => u.email === selectedEmail);
+    const selectedUser = getAuthorizedUserByEmail(selectedEmail);
     const selectedUserName = selectedUser?.name || '';
     
     // Filter bookings where user is either the creator OR the partner
@@ -1138,12 +1138,13 @@ function updatePersonalView() {
         const props = booking.extendedProperties?.private || {};
         const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
         const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
-        const isCreator = normalizeEmail(props.userEmail) === normalizeEmail(selectedEmail);
+        const creatorEmail = getCreatorEmail(booking, props);
+        const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
         const isAdmin = isCurrentUserAdmin();
         const isPartner = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
         const isPartnerCanceled = isBookingPartnerCanceled(props);
         const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
-        const canShowActions = selectedEmail === currentUser?.email;
+        const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(currentUser?.email);
         const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
         const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
         
@@ -1156,7 +1157,7 @@ function updatePersonalView() {
             <td>${statusLabel}</td>
             <td>${canShowActions ? `
                 <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
-                ${(isCreator || isAdmin) ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Loeschen</button>` : ''}
+                ${(isCreator || isAdmin) ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Löschen</button>` : ''}
                 ${canRemovePartner ? `<button class="btn btn-small btn-warning" data-action="remove-partner" data-event="${booking.id}">Partner entfernen</button>` : ''}
                 ${canCancelPartner ? `<button class="btn btn-small btn-warning" data-action="cancel-partner" data-event="${booking.id}">Partner stornieren</button>` : ''}
             ` : '-'}
@@ -1675,7 +1676,7 @@ async function deleteBooking() {
     const props = booking.extendedProperties?.private || {};
     const isCreator = props.userEmail === currentUser?.email;
     if (!isCreator) {
-        showError('mainError', 'Nur der Ersteller kann eine Buchung loeschen.');
+        showError('mainError', 'Nur der Ersteller kann eine Buchung löschen.');
         return;
     }
     
