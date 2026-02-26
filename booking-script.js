@@ -616,10 +616,35 @@ async function cancelPartnerBooking(eventId) {
     };
     
     // Note: sendUpdates 'none' to avoid Domain-Wide Delegation requirement
-    // Service account cannot send notifications without additional setup
     const result = await updateBookingByEventId(eventId, patch, 'none');
     
     if (result) {
+        // 📧 Szenario B: Partner entfernt sich selbst → Owner erhält Benachrichtigung
+        const creatorEmail = getCreatorEmail(booking, props);
+        const creatorUser = getAuthorizedUserByEmail(creatorEmail);
+        const creatorName = creatorUser?.name || creatorEmail;
+        const partnerName = effectiveUser.name || effectiveUser.email;
+        const studioName = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId)?.name || 'Unbekannt';
+        const bookingDate = new Date(booking.start.dateTime).toLocaleDateString('de-DE');
+        const bookingTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
+        
+        const emailBody = `Hallo ${creatorName},\n\n${partnerName} hat sich aus der folgenden Buchung abgemeldet:\n\nStudio: ${studioName}\nDatum: ${bookingDate}\nUhrzeit: ${bookingTime} Uhr\nDauer: ${props.duration} Minuten\n\nDeine Buchung ist nun unvollständig. Du kannst jederzeit einen neuen Partner hinzufügen oder die Buchung ohne Partner durchführen.\n\nBest regards,\nStudio Buchungssystem`;
+        
+        try {
+            await fetch('/api/send-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    to: creatorEmail,
+                    subject: `[Studio Buchung] Partner hat sich abgemeldet`,
+                    body: emailBody
+                })
+            });
+            console.log('✅ Email sent to booking creator:', creatorEmail);
+        } catch (error) {
+            console.error('⚠️  Failed to send email to creator:', error);
+        }
+        
         await loadAllBookings();  // Refresh bookings list
         updateAllViews();  // Update all views to reflect changes
     }
@@ -679,12 +704,35 @@ async function removePartnerByCreator(eventId) {
     };
     
     console.log('📤 Sending patch:', patch);
-    // Note: sendUpdates 'none' to avoid Domain-Wide Delegation requirement
-    // Service account cannot send notifications without additional setup
     const result = await updateBookingByEventId(eventId, patch, 'none');
     console.log('📥 Update result:', result);
     
     if (result) {
+        // 📧 Szenario A: Owner entfernt Partner → Partner erhält Benachrichtigung
+        if (props.partnerEmail) {
+            const ownerName = effectiveUser.name || effectiveUser.email;
+            const studioName = studio?.name || 'Unbekannt';
+            const bookingDate = new Date(booking.start.dateTime).toLocaleDateString('de-DE');
+            const bookingTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
+            
+            const emailBody = `Hallo ${props.partner},\n\n${ownerName} hat dich aus der folgenden Buchung entfernt:\n\nStudio: ${studioName}\nDatum: ${bookingDate}\nUhrzeit: ${bookingTime} Uhr\nDauer: ${props.duration} Minuten\n\nDie Buchung bleibt bestehen und ein neuer Partner kann hinzugefügt werden.\n\nBest regards,\nStudio Buchungssystem`;
+            
+            try {
+                await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: props.partnerEmail,
+                        subject: `[Studio Buchung] Du wurdest aus einer Buchung entfernt`,
+                        body: emailBody
+                    })
+                });
+                console.log('✅ Email sent to removed partner:', props.partnerEmail);
+            } catch (error) {
+                console.error('⚠️  Failed to send email to partner:', error);
+            }
+        }
+        
         await loadAllBookings();  // Refresh bookings list
         updateAllViews();  // Update all views to reflect changes
     }
