@@ -800,13 +800,13 @@ function updateOverviewView() {
             const navHeader = document.createElement('div');
             navHeader.className = 'calendar-mobile-nav';
             navHeader.innerHTML = `
-                <button class="nav-arrow-btn" id="prevStudio">${currentStudioIndex > 0 ? '← Zurück' : ''}</button>
+                <button class="nav-arrow-btn" id="prevStudio">${currentStudioIndex > 0 ? '←' : ''}</button>
                 <div class="mobile-studio-title">
                     <strong>${currentStudio.studio}</strong>
                     <span>${currentStudio.name}</span>
                 </div>
                 <div class="mobile-progress">${currentStudioIndex + 1} / ${studioArray.length}</div>
-                <button class="nav-arrow-btn" id="nextStudio">${currentStudioIndex < studioArray.length - 1 ? 'Weiter →' : ''}</button>
+                <button class="nav-arrow-btn" id="nextStudio">${currentStudioIndex < studioArray.length - 1 ? '→' : ''}</button>
             `;
             
             if (currentStudioIndex === 0) {

@@ -1533,18 +1533,19 @@ body {
     }
     
     .nav-arrow-btn {
-        padding: 8px 12px;
+        padding: 8px 10px;
         background: var(--primary-color);
         color: white;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         font-weight: 500;
-        font-size: 12px;
+        font-size: 16px;
         flex: 0 0 auto;
         transition: all 0.2s;
         box-shadow: 0 2px 4px rgba(74, 144, 226, 0.2);
-        min-width: 70px;
+        min-width: 36px;
+        line-height: 1;
     }
     
     .nav-arrow-btn:active {
