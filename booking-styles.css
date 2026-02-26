@@ -1418,6 +1418,12 @@ body {
         width: 100%;
     }
 
+    .bookings-table {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
     .bookings-table thead {
         display: none;
     }
@@ -1443,9 +1449,19 @@ body {
     .bookings-table td:last-child {
         border-bottom: none;
         justify-content: flex-start;
-        gap: 8px;
-        flex-wrap: wrap;
+        gap: 6px;
+        flex-wrap: nowrap;
         padding-bottom: 0;
+    }
+
+    .bookings-table td:last-child::before {
+        content: '';
+        display: none;
+    }
+
+    .bookings-table td:last-child .btn {
+        padding: 7px 10px;
+        font-size: 11px;
     }
 
     .bookings-table td::before {
