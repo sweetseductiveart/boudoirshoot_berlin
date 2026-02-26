@@ -108,6 +108,9 @@ async function restoreSessionFromStorage() {
             // Load bookings
             await loadAllBookings();
             
+            // Repopulate user selector now that authorized users are loaded
+            populateUserSelector();
+            
             // Restore view from URL or use default
             restoreViewFromURL();
             
@@ -212,6 +215,9 @@ async function handleGoogleSignIn(response) {
     
     // Load bookings
     await loadAllBookings();
+    
+    // Repopulate user selector now that authorized users are loaded
+    populateUserSelector();
     
     // Restore view from URL or use default
     restoreViewFromURL();
