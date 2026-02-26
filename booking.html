@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Buchungssystem - 28.03.2026</title>
+    <link rel="stylesheet" href="booking-styles.css">
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="loginSection" class="section">
+        <div class="login-container">
+            <h1>Studio Buchungssystem</h1>
+            <p class="event-date">Event: 28. März 2026</p>
+            <button id="loginButton" class="btn btn-primary">
+                Mit Google anmelden
+            </button>
+            <div id="loginError" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Main Booking Interface -->
+    <div id="mainInterface" class="section hidden">
+        <!-- Header with User Info -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Studio Buchungssystem</h1>
+                <div class="user-info">
+                    <button id="newBookingButton" class="btn btn-primary">+ Neue Buchung</button>
+                    <span id="userName" class="user-name"></span>
+                    <button id="logoutButton" class="btn btn-secondary">Abmelden</button>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-view="overview">Gesamtübersicht</button>
+                <button class="nav-btn" data-view="personal">Meine Buchungen</button>
+                <button class="nav-btn" data-view="studio">Studio-Ansicht</button>
+                <button class="nav-btn" data-view="print">Druckansicht</button>
+            </nav>
+        </header>
+
+        <!-- Overview View: All 14 Studios -->
+        <div id="overviewView" class="view-container active">
+            <div class="view-header">
+                <h2>Gesamtübersicht - Alle Studios</h2>
+                <div class="legend">
+                    <span class="legend-item"><span class="status-dot available"></span>Verfügbar</span>
+                    <span class="legend-item"><span class="status-dot booked"></span>Gebucht</span>
+                    <span class="legend-item"><span class="status-dot my-booking"></span>Meine Buchung</span>
+                </div>
+            </div>
+            <div class="studios-grid" id="studiosGrid">
+                <!-- Studios will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Personal View: User's Bookings -->
+        <div id="personalView" class="view-container">
+            <div class="view-header">
+                <h2>Meine Buchungen</h2>
+                <div class="user-filter">
+                    <label for="userSelect">Nutzer auswählen:</label>
+                    <select id="userSelect" class="form-select">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+            </div>
+            <div id="personalBookings" class="bookings-list">
+                <!-- Personal bookings will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Studio View: Individual Studio with Booking -->
+        <div id="studioView" class="view-container">
+            <div class="view-header">
+                <h2>Studio-Ansicht</h2>
+                <div class="studio-selector">
+                    <label for="studioSelect">Studio auswählen:</label>
+                    <select id="studioSelect" class="form-select">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+            </div>
+            <div id="studioDetails" class="studio-details">
+                <div class="studio-info">
+                    <h3 id="studioName"></h3>
+                    <p class="studio-date">28. März 2026 | 10:00 - 18:00</p>
+                </div>
+                <div class="booking-form-container">
+                    <h4>Neue Buchung erstellen</h4>
+                    <form id="bookingForm" class="booking-form">
+                        <div class="form-group">
+                            <label for="timeSlotStart">Startzeit:</label>
+                            <select id="timeSlotStart" class="form-select" required>
+                                <option value="">Bitte wählen...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Dauer:</label>
+                            <select id="duration" class="form-select" required>
+                                <option value="">Bitte wählen...</option>
+                                <option value="30">30 Minuten</option>
+                                <option value="60">60 Minuten</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="partnerSelect">Partner (Fotograf/Model):</label>
+                            <select id="partnerSelect" class="form-select" required>
+                                <option value="">Bitte wählen...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notizen (optional):</label>
+                            <textarea id="notes" class="form-textarea" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Buchung erstellen</button>
+                            <button type="button" id="cancelBooking" class="btn btn-secondary">Abbrechen</button>
+                        </div>
+                        <div id="bookingError" class="error-message"></div>
+                        <div id="bookingSuccess" class="success-message"></div>
+                    </form>
+                </div>
+                <div class="time-slots-container">
+                    <h4>Zeitplan</h4>
+                    <div id="timeSlots" class="time-slots">
+                        <!-- Time slots will be dynamically generated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print View: Printable Schedule -->
+        <div id="printView" class="view-container">
+            <div class="view-header no-print">
+                <h2>Druckansicht</h2>
+                <div class="print-options">
+                    <label for="printStudioSelect">Studio auswählen:</label>
+                    <select id="printStudioSelect" class="form-select">
+                        <option value="all">Alle Studios</option>
+                    </select>
+                    <button id="printButton" class="btn btn-primary">Drucken</button>
+                </div>
+            </div>
+            <div id="printContent" class="print-content">
+                <!-- Print content will be generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Lädt...</p>
+    </div>
+
+    <!-- Booking Details Modal -->
+    <div id="bookingModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Buchungsdetails</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Booking details will be displayed here -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button id="deleteBooking" class="btn btn-danger hidden">Buchung löschen</button>
+                <button id="cancelPartner" class="btn btn-warning hidden">Partner stornieren</button>
+                <button class="btn btn-secondary modal-close">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Booking Modal -->
+    <div id="newBookingModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Neue Buchung erstellen</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newBookingForm" class="booking-form">
+                    <div class="form-group">
+                        <label for="bookingStudio">Studio / Zone *</label>
+                        <select id="bookingStudio" class="form-select" required>
+                            <option value="">-- Bitte wählen --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingStartTime">Startzeit *</label>
+                        <select id="bookingStartTime" class="form-select" required>
+                            <option value="">-- Bitte wählen --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingDuration">Dauer *</label>
+                        <select id="bookingDuration" class="form-select" required>
+                            <option value="30">30 Minuten</option>
+                            <option value="60">60 Minuten</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingPartner">Partner (Model/Fotograf) *</label>
+                        <select id="bookingPartner" class="form-select" required>
+                            <option value="">-- Bitte wählen --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingNotes">Notizen (optional)</label>
+                        <textarea id="bookingNotes" class="form-textarea" rows="3" placeholder="Besondere Wünsche, Anmerkungen..."></textarea>
+                    </div>
+                    
+                    <div id="newBookingError" class="error-message"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="submitNewBooking" class="btn btn-primary">Buchung erstellen</button>
+                <button class="btn btn-secondary modal-close">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Bestätigung</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Bist du sicher?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmYes" class="btn btn-danger">Ja, bestätigen</button>
+                <button id="confirmNo" class="btn btn-secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration -->
+    <script src="booking-config.js"></script>
+    
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client"></script>
+    
+    <!-- Main Script -->
+    <script src="booking-script.js"></script>
+</body>
+</html>
