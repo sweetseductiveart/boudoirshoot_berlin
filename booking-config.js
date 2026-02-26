@@ -128,82 +128,9 @@ const BOOKING_CONFIG = {
     ],
     
     // Authorized Users Configuration
-    // WICHTIG: Nur diese Benutzer können sich einloggen und Buchungen vornehmen
-    AUTHORIZED_USERS: [
-        {
-            email: 'dominik.suess@gmail.com',
-            name: 'Dominik Süß',
-            role: 'Administrator',
-            defaultPartner: 'nale270788@gmail.com'
-        },
-        {
-            email: 'nale270788@gmail.com',
-            name: 'Nale',
-            role: 'Model',
-            defaultPartner: 'dominik.suess@gmail.com'
-        },
-        {
-            email: 'fotograf1@example.com',
-            name: 'Max Mustermann',
-            role: 'Fotograf'
-        },
-        {
-            email: 'fotograf2@example.com',
-            name: 'Anna Schmidt',
-            role: 'Fotografin'
-        },
-        {
-            email: 'model1@example.com',
-            name: 'Lisa Müller',
-            role: 'Model'
-        },
-        {
-            email: 'model2@example.com',
-            name: 'Sarah Wagner',
-            role: 'Model'
-        },
-        {
-            email: 'model3@example.com',
-            name: 'Julia Fischer',
-            role: 'Model'
-        },
-        {
-            email: 'fotograf3@example.com',
-            name: 'Tom Weber',
-            role: 'Fotograf'
-        },
-        {
-            email: 'model4@example.com',
-            name: 'Nina Becker',
-            role: 'Model'
-        },
-        {
-            email: 'fotograf4@example.com',
-            name: 'Michael Klein',
-            role: 'Fotograf'
-        },
-        {
-            email: 'model5@example.com',
-            name: 'Emma Hoffmann',
-            role: 'Model'
-        },
-        {
-            email: 'fotograf5@example.com',
-            name: 'David Schröder',
-            role: 'Fotograf'
-        },
-        {
-            email: 'model6@example.com',
-            name: 'Sophie Zimmermann',
-            role: 'Model'
-        },
-        {
-            email: 'admin@example.com',
-            name: 'Admin',
-            role: 'Administrator'
-        }
-        // Weitere Benutzer hier hinzufügen...
-    ],
+    // WICHTIG: Diese werden von der API (/api/get-config) geladen
+    // Die Konfiguration ist verschlüsselt und wird vom Server entschlüsselt
+    AUTHORIZED_USERS: [],  // Wird bei Login von API gefüllt
     
     // Booking Rules
     RULES: {

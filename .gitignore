@@ -31,3 +31,11 @@ service-account-*.json
 credentials.json
 token.json
 *-service-account-*.json
+
+# Unencrypted configuration (NIEMALS einchecken!)
+# This file contains sensitive user data and should only exist locally
+config/authorized-users.json
+config/authorized-users.unencrypted.json
+
+# Encryption utility output
+encrypt-config.log
