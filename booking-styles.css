@@ -182,6 +182,7 @@ body {
 
 .nav-toggle {
     display: none;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 42px;
@@ -191,6 +192,8 @@ body {
     background: rgba(255,255,255,.05);
     cursor: pointer;
     transition: all 0.12s ease;
+    padding: 8px;
+    gap: 4px;
 }
 
 .nav-toggle:hover {
@@ -204,10 +207,6 @@ body {
     height: 2px;
     background: var(--text);
     border-radius: 999px;
-}
-
-.nav-toggle__bar + .nav-toggle__bar {
-    margin-top: 4px;
 }
 
 .header-content {
@@ -312,21 +311,20 @@ body {
     }
 
     .header-content h1 {
-        font-size: 1.1rem;
-        flex: 1;
-        min-width: 0;
+        display: none;
     }
 
     .nav-toggle {
-        display: inline-flex;
+        display: flex;
         width: 36px;
         height: 34px;
+        order: 999;
     }
 
     .user-info {
-        flex: 0 1 auto;
+        flex: 1 1 auto;
         gap: 8px;
-        order: -1;
+        order: 0;
     }
 
     .user-name {
