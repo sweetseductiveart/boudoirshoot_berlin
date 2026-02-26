@@ -390,13 +390,37 @@ function isCurrentUserPartner(props) {
 
 function buildPartnerCancelDescription(existingDescription, partnerName, canceledAt, label = 'Partner storniert') {
     const statusLine = `Status: ${label} (${partnerName || 'Partner'}) am ${canceledAt}`;
-    if (existingDescription && existingDescription.includes('Status: Partner')) {
-        return existingDescription;
-    }
-    if (!existingDescription) {
+    const notes = sanitizeNotesDescription(existingDescription);
+    if (!notes) {
         return statusLine;
     }
-    return `${existingDescription}\n${statusLine}`;
+    return `${notes}\n${statusLine}`;
+}
+
+function sanitizeNotesDescription(description) {
+    if (!description) return '';
+    const lines = description.split('\n').map(line => line.trim());
+    const cleaned = [];
+    lines.forEach(line => {
+        if (!line) return;
+        if (line.startsWith('Fotograf/in:')) return;
+        if (line.startsWith('Partner:')) return;
+        if (line.startsWith('Status:')) return;
+        if (line.startsWith('Noten:')) {
+            const note = line.replace('Noten:', '').trim();
+            if (note) cleaned.push(note);
+            return;
+        }
+        cleaned.push(line);
+    });
+    return cleaned.join('\n');
+}
+
+function stripPartnerFromSummary(summary, partnerName) {
+    if (!summary) return summary;
+    if (!partnerName) return summary;
+    const escapedPartner = partnerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return summary.replace(new RegExp(`\\s*[&+]\\s*${escapedPartner}$`), '').trim();
 }
 
 async function cancelPartnerBooking(eventId) {
@@ -419,11 +443,15 @@ async function cancelPartnerBooking(eventId) {
     if (!confirmed) return false;
     
     const canceledAt = new Date().toLocaleString('de-DE');
+    const updatedSummary = stripPartnerFromSummary(booking.summary, props.partner);
     const patch = {
+        summary: updatedSummary,
         description: buildPartnerCancelDescription(booking.description, props.partner, canceledAt, 'Partner storniert'),
         extendedProperties: {
             private: {
                 ...props,
+                partner: '',
+                partnerEmail: '',
                 partnerCanceled: 'true',
                 partnerCanceledByEmail: currentUser.email,
                 partnerCanceledByName: currentUser.name,
@@ -471,11 +499,15 @@ async function removePartnerByCreator(eventId) {
     }
     
     const canceledAt = new Date().toLocaleString('de-DE');
+    const updatedSummary = stripPartnerFromSummary(booking.summary, props.partner);
     const patch = {
+        summary: updatedSummary,
         description: buildPartnerCancelDescription(booking.description, props.partner, canceledAt, 'Partner entfernt'),
         extendedProperties: {
             private: {
                 ...props,
+                partner: '',
+                partnerEmail: '',
                 partnerCanceled: 'true',
                 partnerCanceledByEmail: currentUser.email,
                 partnerCanceledByName: currentUser.name,
@@ -1218,7 +1250,7 @@ function showBookingModal(eventId) {
         <p><strong>Fotograf/in:</strong> ${props.userEmail}</p>
         ${partnerUI}
         <p><strong>Status:</strong> ${statusLabel}</p>
-        <p><strong>Notizen:</strong> ${booking.description || '-'}</p>
+        <p><strong>Notizen:</strong> ${sanitizeNotesDescription(booking.description) || '-'}</p>
     `;
     
     const deleteBtn = document.getElementById('deleteBooking');
@@ -1273,16 +1305,17 @@ async function confirmNewPartner() {
         newPartnerName = partnerUser?.name || newPartnerEmail;
     }
     
-    // Build new description with partner update
-    const description = booking.description || '';
-    let updatedDescription = description;
+    // Keep notes clean (no Fotograf/in, Partner, Status lines)
+    const updatedDescription = sanitizeNotesDescription(booking.description || '');
+
+    // Update summary to reflect current partner selection
+    let updatedSummary = stripPartnerFromSummary(booking.summary, props.partner);
     if (newPartnerName) {
-        updatedDescription = `Fotograf/in: ${props.userEmail}\nPartner: ${newPartnerName}\n\n${description}`;
-    } else {
-        updatedDescription = description;
+        updatedSummary = `${updatedSummary} & ${newPartnerName}`;
     }
     
     const patch = {
+        summary: updatedSummary,
         description: updatedDescription,
         extendedProperties: {
             private: {
@@ -1290,9 +1323,9 @@ async function confirmNewPartner() {
                 partner: newPartnerName,
                 partnerEmail: newPartnerEmail,
                 partnerCanceled: 'false',  // Reset partner canceled status
-                partnerCanceledByEmail: undefined,
-                partnerCanceledByName: undefined,
-                partnerCanceledAt: undefined
+                partnerCanceledByEmail: '',
+                partnerCanceledByName: '',
+                partnerCanceledAt: ''
             }
         }
     };
