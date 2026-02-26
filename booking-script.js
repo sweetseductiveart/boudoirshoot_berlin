@@ -5,6 +5,7 @@
 
 let currentUser = null;
 let allBookings = [];
+let impersonatedUserEmail = null;  // For admin debugging
 
 // Session persistence key
 const USER_STORAGE_KEY = 'booking_system_user';
@@ -76,6 +77,15 @@ function initializeUI() {
         updatePersonalView();
         updateURLHash();
     });
+    
+    // Admin impersonate selector
+    const impersonateSelect = document.getElementById('impersonateSelect');
+    if (impersonateSelect) {
+        impersonateSelect.addEventListener('change', (e) => {
+            setImpersonatedUser(e.target.value || null);
+            updatePersonalView();
+        });
+    }
     
     // Populate selectors
     populateStudioSelector();
@@ -236,6 +246,9 @@ async function handleGoogleSignIn(response) {
     // Repopulate user selector now that authorized users are loaded
     populateUserSelector();
     
+    // Show admin impersonation selector if user is admin
+    populateImpersonateSelector();
+    
     // Restore view from URL or use default
     restoreViewFromURL();
 }
@@ -253,6 +266,7 @@ function parseJwt(token) {
 function logout() {
     currentUser = null;
     allBookings = [];
+    impersonatedUserEmail = null;
     
     // Clear from storage
     clearSessionStorage();
@@ -262,6 +276,47 @@ function logout() {
     document.getElementById('userName').textContent = '';
     
     console.log('👋 Logged out');
+}
+
+// ============================================
+// ADMIN IMPERSONATION (FOR DEBUGGING)
+// ============================================
+
+function setImpersonatedUser(userEmail) {
+    impersonatedUserEmail = userEmail;
+    
+    // Update UI to show impersonation status
+    const impersonateSelect = document.getElementById('impersonateSelect');
+    if (impersonateSelect && userEmail) {
+        const user = getAuthorizedUserByEmail(userEmail);
+        console.log(`🔍 Admin impersonating: ${user?.name || userEmail}`);
+    } else {
+        console.log('🔍 Impersonation disabled');
+    }
+}
+
+function getEffectiveUser() {
+    // If admin is impersonating, return the impersonated user
+    if (impersonatedUserEmail && isCurrentUserAdmin()) {
+        return getAuthorizedUserByEmail(impersonatedUserEmail) || { email: impersonatedUserEmail };
+    }
+    // Otherwise return the currently logged-in user
+    return currentUser;
+}
+
+function populateImpersonateSelector() {
+    const impersonateSelect = document.getElementById('impersonateSelect');
+    if (!impersonateSelect || !isCurrentUserAdmin()) return;
+    
+    // Only show for admins
+    document.getElementById('adminImpersonate').classList.remove('hidden');
+    
+    // Populate with all authorized users
+    const options = BOOKING_CONFIG.AUTHORIZED_USERS
+        .map(u => `<option value="${u.email}">${u.name}</option>`)
+        .join('');
+    
+    impersonateSelect.innerHTML = '<option value="">-- Keine Personifikation --</option>' + options;
 }
 
 // ============================================
@@ -1144,7 +1199,7 @@ function updatePersonalView() {
         const isPartner = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
         const isPartnerCanceled = isBookingPartnerCanceled(props);
         const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
-        const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(currentUser?.email);
+        const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(currentUser?.email) || isAdmin;
         const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
         const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
         

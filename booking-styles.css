@@ -242,6 +242,31 @@ body {
     text-overflow: ellipsis;
 }
 
+.admin-impersonate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: 4px;
+}
+
+.admin-impersonate label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.admin-impersonate .form-select {
+    font-size: 11px;
+    padding: 4px 8px;
+}
+
+.admin-impersonate.hidden {
+    display: none;
+}
+
 .main-nav {
     display: flex;
     gap: 8px;
@@ -328,6 +353,16 @@ body {
     }
 
     .user-name {
+        display: none;
+    }
+
+    .admin-impersonate {
+        flex: 1 1 auto;
+        min-width: 280px;
+        padding: 6px 8px;
+    }
+
+    .admin-impersonate label {
         display: none;
     }
 
