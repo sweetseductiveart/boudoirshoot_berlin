@@ -24,8 +24,8 @@ const BOOKING_CONFIG = {
     // Studio Zones Configuration (14 Zonen in 3 Studios)
     // WICHTIG: Alle Zonen teilen sich einen Master-Kalender
     // Studio 1: Zone 1-6 (6 Zonen) - ROT/ORANGE Töne
-    // Studio 4: Zone 1-4 (4 Zonen) - GRÜN/TÜRKIS Töne
     // Studio 3: Zone 1-4 (4 Zonen) - BLAU/LILA Töne
+    // Studio 4: Zone 1-4 (4 Zonen) - GRÜN/TÜRKIS Töne
     STUDIOS: [
         {
             id: 'studio1_zone1',
@@ -70,34 +70,6 @@ const BOOKING_CONFIG = {
             color: '#F8B739'  // Orange-hell
         },
         {
-            id: 'studio4_zone1',
-            name: 'Studio 4 - Zone 1',
-            studio: 'Studio 4',
-            zone: 1,
-            color: '#27AE60'  // Grün-dunkel
-        },
-        {
-            id: 'studio4_zone2',
-            name: 'Studio 4 - Zone 2',
-            studio: 'Studio 4',
-            zone: 2,
-            color: '#52BE80'  // Grün-mittel
-        },
-        {
-            id: 'studio4_zone3',
-            name: 'Studio 4 - Zone 3',
-            studio: 'Studio 4',
-            zone: 3,
-            color: '#16A085'  // Türkis-dunkel
-        },
-        {
-            id: 'studio4_zone4',
-            name: 'Studio 4 - Zone 4',
-            studio: 'Studio 4',
-            zone: 4,
-            color: '#48C9B0'  // Türkis-hell
-        },
-        {
             id: 'studio3_zone1',
             name: 'Studio 3 - Zone 1',
             studio: 'Studio 3',
@@ -124,6 +96,34 @@ const BOOKING_CONFIG = {
             studio: 'Studio 3',
             zone: 4,
             color: '#A569BD'  // Lila-hell
+        },
+        {
+            id: 'studio4_zone1',
+            name: 'Studio 4 - Zone 1',
+            studio: 'Studio 4',
+            zone: 1,
+            color: '#27AE60'  // Grün-dunkel
+        },
+        {
+            id: 'studio4_zone2',
+            name: 'Studio 4 - Zone 2',
+            studio: 'Studio 4',
+            zone: 2,
+            color: '#52BE80'  // Grün-mittel
+        },
+        {
+            id: 'studio4_zone3',
+            name: 'Studio 4 - Zone 3',
+            studio: 'Studio 4',
+            zone: 3,
+            color: '#16A085'  // Türkis-dunkel
+        },
+        {
+            id: 'studio4_zone4',
+            name: 'Studio 4 - Zone 4',
+            studio: 'Studio 4',
+            zone: 4,
+            color: '#48C9B0'  // Türkis-hell
         }
     ],
     
