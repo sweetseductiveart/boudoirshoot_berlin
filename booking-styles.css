@@ -57,15 +57,16 @@ body {
    ============================================ */
 
 .btn {
-    padding: 11px 18px;
+    padding: 10px 16px;
     border: 1px solid var(--line);
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 800;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.12s ease;
     display: inline-block;
     text-align: center;
+    white-space: nowrap;
 }
 
 .btn-primary {
@@ -176,6 +177,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+    flex-shrink: 0;
 }
 
 .nav-toggle {
@@ -212,26 +214,33 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 30px;
+    padding: 12px 16px;
+    gap: 12px;
 }
 
 .header-content h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--text);
     font-weight: 700;
     letter-spacing: -0.015em;
+    margin: 0;
 }
 
 .user-info {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .user-name {
     font-weight: 600;
     color: var(--text);
-    font-size: 14px;
+    font-size: 12px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .main-nav {
@@ -286,6 +295,7 @@ body {
     overflow: hidden;
     box-sizing: border-box;
     min-height: 0;
+    padding: 0;
 }
 
 /* ============================================
@@ -294,68 +304,93 @@ body {
 
 @media (max-width: 820px) {
     .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 12px 20px 10px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        justify-content: space-between;
+    }
+
+    .header-content h1 {
+        font-size: 1.1rem;
+        flex: 1;
+        min-width: 0;
     }
 
     .nav-toggle {
         display: inline-flex;
+        width: 36px;
+        height: 34px;
     }
 
     .user-info {
-        width: 100%;
-        flex-wrap: wrap;
-        justify-content: flex-start;
+        flex: 0 1 auto;
+        gap: 8px;
+        order: -1;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .btn-primary {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    .btn-secondary {
+        padding: 8px 10px;
+        font-size: 11px;
     }
 
     .main-nav {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 8px;
         max-height: 0;
         opacity: 0;
         overflow: hidden;
-        padding: 0 20px;
+        padding: 0 12px;
         transition: max-height 0.2s ease, opacity 0.2s ease;
+        border-bottom: none;
     }
 
     .main-nav.is-open {
-        max-height: 280px;
+        max-height: 200px;
         opacity: 1;
-        padding-bottom: 16px;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
     }
 
     .nav-btn {
         width: 100%;
         text-align: left;
+        padding: 9px 12px;
+        font-size: 12px;
     }
 
     .view-header {
-        position: static;
-        padding: 12px 16px 0 16px;
-        gap: 10px;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
+        padding: 10px 12px 0 12px;
     }
 
     .view-header h2 {
-        font-size: 1.2rem;
+        font-size: 0.95rem;
     }
 
     .legend {
-        padding: 0 16px 12px 16px;
-        gap: 12px;
+        padding: 6px 12px 8px 12px;
+        gap: 10px;
     }
 
     .legend-item {
-        font-size: 12px;
-        gap: 8px;
+        font-size: 10px;
+        gap: 5px;
     }
 
     .status-dot {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
     }
 }
 
@@ -367,21 +402,22 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px 20px 0 20px;
+    gap: 10px;
+    padding: 12px 16px 0 16px;
     background: transparent;
-    position: sticky;
-    top: 0;
+    position: static;
     z-index: 5;
+    flex-shrink: 0;
 }
 
 .view-header h2 {
-    font-size: 1.4rem;
+    font-size: 1rem;
     color: var(--text);
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.015em;
+    margin: 0;
 }
 
 /* ============================================
@@ -390,17 +426,18 @@ body {
 
 .legend {
     display: flex;
-    gap: 25px;
+    gap: 12px;
     flex-wrap: wrap;
-    padding: 0 20px 20px 20px;
+    padding: 8px 16px 10px 16px;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 13px;
+    gap: 6px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text);
 }
@@ -450,7 +487,7 @@ body {
     overflow-y: auto;
     box-shadow: var(--shadow);
     border: 1px solid var(--line);
-    margin: 0;
+    margin: 0 16px 16px 16px;
     padding: 0;
     flex: 1;
     display: flex;
@@ -1344,6 +1381,7 @@ body {
 @media (max-width: 768px) {
     .studios-grid {
         grid-template-columns: 1fr;
+        margin: 0 16px;
     }
 
     .table-header,
@@ -1362,17 +1400,13 @@ body {
         padding: 15px;
     }
 
-    .view-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
     .detail-row {
         grid-template-columns: 1fr;
     }
 
     .bookings-list {
-        padding: 16px;
+        padding: 12px;
+        margin: 0 16px;
     }
 
     .bookings-table,
@@ -1390,26 +1424,27 @@ body {
     }
 
     .bookings-table tr {
-        margin-bottom: 14px;
+        margin-bottom: 12px;
         background: rgba(255,255,255,.03);
         border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 12px;
+        border-radius: 10px;
+        padding: 10px;
     }
 
     .bookings-table td {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
-        padding: 10px 6px;
+        gap: 10px;
+        padding: 8px 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        font-size: 12px;
     }
 
     .bookings-table td:last-child {
         border-bottom: none;
         justify-content: flex-start;
-        gap: 10px;
+        gap: 8px;
         flex-wrap: wrap;
     }
 
@@ -1417,7 +1452,8 @@ body {
         content: attr(data-label);
         font-weight: 600;
         color: var(--muted);
-        min-width: 110px;
+        min-width: 90px;
+        font-size: 11px;
     }
 }
 
