@@ -87,6 +87,13 @@ async function restoreSessionFromStorage() {
     
     if (savedUser) {
         try {
+            // Load authorization config from API first
+            const configLoaded = await loadAuthorizationConfig();
+            if (!configLoaded) {
+                clearSessionStorage();
+                return false;
+            }
+            
             const user = JSON.parse(savedUser);
             
             // Restore user session
@@ -133,6 +140,34 @@ function loginWithGoogle() {
     google.accounts.id.prompt();
 }
 
+async function loadAuthorizationConfig() {
+    try {
+        console.log('🔐 Loading encrypted authorization config from API...');
+        const response = await fetch(`${BOOKING_CONFIG.VERCEL_API_URL}/get-config`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load config: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Unknown error');
+        }
+        
+        // Store in config
+        BOOKING_CONFIG.AUTHORIZED_USERS = data.AUTHORIZED_USERS;
+        console.log('✅ Authorization config loaded successfully');
+        console.log(`📋 ${BOOKING_CONFIG.AUTHORIZED_USERS.length} authorized users loaded`);
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Error loading authorization config:', error);
+        showError('loginError', 'Fehler beim Laden der Benutzerkonfiguration. Bitte später erneut versuchen.');
+        return false;
+    }
+}
+
 async function handleGoogleSignIn(response) {
     if (response.error) {
         console.error('❌ Sign-In error:', response.error);
@@ -140,6 +175,10 @@ async function handleGoogleSignIn(response) {
     }
     
     console.log('✅ Google Sign-In successful');
+    
+    // Load authorization config from API first
+    const configLoaded = await loadAuthorizationConfig();
+    if (!configLoaded) return;
     
     // Decode JWT token to get user info
     const payload = parseJwt(response.credential);
