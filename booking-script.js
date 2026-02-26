@@ -802,9 +802,10 @@ function updateOverviewView() {
             navHeader.innerHTML = `
                 <button class="nav-arrow-btn" id="prevStudio">${currentStudioIndex > 0 ? '← Zurück' : ''}</button>
                 <div class="mobile-studio-title">
-                    <strong>${currentStudio.studio}</strong><br>
+                    <strong>${currentStudio.studio}</strong>
                     <span>${currentStudio.name}</span>
                 </div>
+                <div class="mobile-progress">${currentStudioIndex + 1} / ${studioArray.length}</div>
                 <button class="nav-arrow-btn" id="nextStudio">${currentStudioIndex < studioArray.length - 1 ? 'Weiter →' : ''}</button>
             `;
             
@@ -814,12 +815,6 @@ function updateOverviewView() {
             if (currentStudioIndex === studioArray.length - 1) {
                 navHeader.querySelector('#nextStudio').style.visibility = 'hidden';
             }
-            
-            // Studio progress indicator
-            const progress = document.createElement('div');
-            progress.className = 'mobile-progress';
-            progress.innerHTML = `${currentStudioIndex + 1} / ${studioArray.length}`;
-            navHeader.appendChild(progress);
             
             calendarDiv.appendChild(navHeader);
             
