@@ -294,15 +294,33 @@ function setImpersonatedUser(userEmail) {
     } else {
         console.log('🔍 Impersonation disabled');
     }
+
+    const userSelect = document.getElementById('userSelect');
+    if (userSelect) {
+        userSelect.value = userEmail || currentUser?.email || '';
+    }
+
+    updateAllViews();
 }
 
-function getEffectiveUser() {
-    // If admin is impersonating, return the impersonated user
-    if (impersonatedUserEmail && isCurrentUserAdmin()) {
-        return getAuthorizedUserByEmail(impersonatedUserEmail) || { email: impersonatedUserEmail };
+function getEffectiveUserContext() {
+    const isAdmin = isCurrentUserAdmin();
+    if (impersonatedUserEmail && isAdmin) {
+        const user = getAuthorizedUserByEmail(impersonatedUserEmail);
+        return {
+            email: user?.email || impersonatedUserEmail,
+            name: user?.name || impersonatedUserEmail,
+            isAdmin: false,
+            isImpersonating: true
+        };
     }
-    // Otherwise return the currently logged-in user
-    return currentUser;
+
+    return {
+        email: currentUser?.email || '',
+        name: currentUser?.name || '',
+        isAdmin: isAdmin,
+        isImpersonating: false
+    };
 }
 
 function populateImpersonateSelector() {
@@ -318,6 +336,7 @@ function populateImpersonateSelector() {
         .join('');
     
     impersonateSelect.innerHTML = '<option value="">-- Keine Personifikation --</option>' + options;
+    impersonateSelect.value = impersonatedUserEmail || '';
 }
 
 // ============================================
@@ -481,10 +500,11 @@ function getCreatorEmail(booking, props) {
 }
 
 function isCurrentUserPartner(props) {
-    if (!currentUser) return false;
-    const currentEmail = normalizeEmail(currentUser.email);
-    const currentName = getDisplayNameByEmail(currentUser.email) || currentUser.name;
-    return normalizeEmail(props.partnerEmail) === currentEmail || props.partner === currentName || props.partner === currentUser.name;
+    const effectiveUser = getEffectiveUserContext();
+    if (!effectiveUser.email) return false;
+    const currentEmail = normalizeEmail(effectiveUser.email);
+    const currentName = getDisplayNameByEmail(effectiveUser.email) || effectiveUser.name;
+    return normalizeEmail(props.partnerEmail) === currentEmail || props.partner === currentName || props.partner === effectiveUser.name;
 }
 
 function buildPartnerCancelDescription(existingDescription, partnerName, canceledAt, label = 'Partner storniert') {
@@ -561,6 +581,7 @@ async function cancelPartnerBooking(eventId) {
     if (!booking) return false;
     
     const props = booking.extendedProperties?.private || {};
+    const effectiveUser = getEffectiveUserContext();
     const isPartner = isCurrentUserPartner(props);
     if (!isPartner) {
         showError('mainError', 'Nur der eingetragene Partner kann diese Stornierung ausfuehren.');
@@ -586,8 +607,8 @@ async function cancelPartnerBooking(eventId) {
                 partner: '',
                 partnerEmail: '',
                 partnerCanceled: 'true',
-                partnerCanceledByEmail: currentUser.email,
-                partnerCanceledByName: currentUser.name,
+                partnerCanceledByEmail: effectiveUser.email,
+                partnerCanceledByName: effectiveUser.name,
                 partnerCanceledByRole: 'partner',
                 partnerCanceledAt: new Date().toISOString()
             }
@@ -614,7 +635,8 @@ async function removePartnerByCreator(eventId) {
     }
     
     const props = booking.extendedProperties?.private || {};
-    const isCreator = props.userEmail === currentUser?.email;
+    const effectiveUser = getEffectiveUserContext();
+    const isCreator = normalizeEmail(props.userEmail) === normalizeEmail(effectiveUser.email);
     if (!isCreator) {
         showError('mainError', 'Nur der Ersteller kann den Partner entfernen.');
         return false;
@@ -648,8 +670,8 @@ async function removePartnerByCreator(eventId) {
                 partner: '',
                 partnerEmail: '',
                 partnerCanceled: 'true',
-                partnerCanceledByEmail: currentUser.email,
-                partnerCanceledByName: currentUser.name,
+                partnerCanceledByEmail: effectiveUser.email,
+                partnerCanceledByName: effectiveUser.name,
                 partnerCanceledByRole: 'creator',
                 partnerCanceledAt: new Date().toISOString()
             }
@@ -675,7 +697,8 @@ async function cancelPartnerBookingFromModal() {
     if (!booking) return;
     
     const props = booking.extendedProperties?.private || {};
-    const isCreator = props.userEmail === currentUser?.email;
+    const effectiveUser = getEffectiveUserContext();
+    const isCreator = normalizeEmail(props.userEmail) === normalizeEmail(effectiveUser.email);
     if (isCreator) {
         await removePartnerByCreator(eventId);
     } else {
@@ -847,8 +870,9 @@ function populateUserSelector() {
         select.appendChild(option);
     });
     
-    if (currentUser) {
-        select.value = currentUser.email;
+    const effectiveUser = getEffectiveUserContext();
+    if (effectiveUser.email) {
+        select.value = effectiveUser.email;
     }
 }
 
@@ -862,6 +886,8 @@ function updateAllViews() {
 function updateOverviewView() {
     const grid = document.getElementById('studiosGrid');
     grid.innerHTML = '';
+
+    const effectiveUser = getEffectiveUserContext();
     
     // Get all time slots
     const slots = generateTimeSlots(BOOKING_CONFIG.EVENT_START_TIME, BOOKING_CONFIG.EVENT_END_TIME, 30);
@@ -957,7 +983,7 @@ function updateOverviewView() {
                 
                 if (booking) {
                     const props = booking.extendedProperties?.private || {};
-                    const isMyBooking = props.userEmail === currentUser?.email;
+                    const isMyBooking = normalizeEmail(props.userEmail) === normalizeEmail(effectiveUser.email);
                     const isPartnerCanceled = isBookingPartnerCanceled(props);
                     const bookingStart = new Date(booking.start.dateTime);
                     const bookingStartTime = bookingStart.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
@@ -1090,7 +1116,7 @@ function updateOverviewView() {
                 
                 if (booking) {
                     const props = booking.extendedProperties?.private || {};
-                    const isMyBooking = props.userEmail === currentUser?.email;
+                    const isMyBooking = normalizeEmail(props.userEmail) === normalizeEmail(effectiveUser.email);
                     const isPartnerCanceled = isBookingPartnerCanceled(props);
                     const bookingStart = new Date(booking.start.dateTime);
                     const bookingStartTime = bookingStart.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
@@ -1148,6 +1174,8 @@ function updatePersonalView() {
     const selectedEmail = document.getElementById('userSelect').value;
     const container = document.getElementById('personalBookings');
     container.innerHTML = '';
+
+    const effectiveUser = getEffectiveUserContext();
     
     // Find the selected user's name
     const selectedUser = getAuthorizedUserByEmail(selectedEmail);
@@ -1196,11 +1224,11 @@ function updatePersonalView() {
         const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
         const creatorEmail = getCreatorEmail(booking, props);
         const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
-        const isAdmin = isCurrentUserAdmin();
+        const isAdmin = effectiveUser.isAdmin;
         const isPartner = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
         const isPartnerCanceled = isBookingPartnerCanceled(props);
         const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
-        const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(currentUser?.email) || isAdmin;
+        const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(effectiveUser.email) || isAdmin;
         const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
         const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
         
@@ -1252,6 +1280,8 @@ function updatePersonalView() {
 function updateStudioView() {
     const selectedStudioId = document.getElementById('studioSelect').value;
     const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === selectedStudioId);
+
+    const effectiveUser = getEffectiveUserContext();
     
     if (!studio) return;
     
@@ -1294,7 +1324,7 @@ function updateStudioView() {
             const bookingStart = new Date(booking.start.dateTime);
             const bookingStartTime = bookingStart.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
             const duration = parseInt(props.duration || 30);
-            const isMyBooking = props.userEmail === currentUser?.email;
+            const isMyBooking = normalizeEmail(props.userEmail) === normalizeEmail(effectiveUser.email);
             const isPartnerCanceled = isBookingPartnerCanceled(props);
             
             slotClass = isMyBooking ? 'time-slot my-booking' : 'time-slot booked';
@@ -1374,8 +1404,9 @@ function showBookingModal(eventId) {
     const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
     const startTime = new Date(booking.start.dateTime).toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
     const creatorEmail = getCreatorEmail(booking, props);
-    const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(currentUser?.email);
-    const isAdmin = isCurrentUserAdmin();
+    const effectiveUser = getEffectiveUserContext();
+    const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(effectiveUser.email);
+    const isAdmin = effectiveUser.isAdmin;
     const isPartner = isCurrentUserPartner(props);
     const isPartnerCanceled = isBookingPartnerCanceled(props);
     const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
@@ -1455,7 +1486,8 @@ async function confirmNewPartner() {
     if (!booking) return;
     
     const props = booking.extendedProperties?.private || {};
-    const isCreator = props.userEmail === currentUser?.email;
+    const effectiveUser = getEffectiveUserContext();
+    const isCreator = normalizeEmail(props.userEmail) === normalizeEmail(effectiveUser.email);
     if (!isCreator) {
         showError('mainError', 'Nur der Ersteller kann den Partner ändern.');
         return;
@@ -1730,8 +1762,9 @@ async function deleteBooking() {
     if (!booking) return;
     
     const props = booking.extendedProperties?.private || {};
-    const isCreator = props.userEmail === currentUser?.email;
-    if (!isCreator) {
+    const effectiveUser = getEffectiveUserContext();
+    const isCreator = normalizeEmail(props.userEmail) === normalizeEmail(effectiveUser.email);
+    if (!isCreator && !effectiveUser.isAdmin) {
         showError('mainError', 'Nur der Ersteller kann eine Buchung löschen.');
         return;
     }
