@@ -416,43 +416,35 @@ function sanitizeNotesDescription(description) {
     return cleaned.join('\n');
 }
 
-function stripPartnerFromSummary(summary, partnerName) {
-    if (!summary) return summary;
-    if (!partnerName) return summary;
-    const escapedPartner = partnerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return summary.replace(new RegExp(`\\s*[&+]\\s*${escapedPartner}$`), '').trim();
-}
-
-function stripPartnerFromPeopleLine(peopleLine, partnerName) {
-    if (!peopleLine || !partnerName) return peopleLine;
-    const escapedPartner = partnerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return peopleLine.replace(new RegExp(`\\s*[&+]\\s*${escapedPartner}$`), '').trim();
-}
-
-function replacePartnerInSummary(summary, oldPartner, newPartner) {
-    if (!summary) return summary;
-    if (!oldPartner && !newPartner) return summary;
-    const parts = summary.split(' - ');
+function splitSummary(summary) {
+    const parts = (summary || '').split(' - ');
     if (parts.length < 2) {
-        const cleaned = oldPartner ? stripPartnerFromSummary(summary, oldPartner) : summary;
-        return newPartner ? `${cleaned} & ${newPartner}` : cleaned;
+        return { prefix: '', people: summary || '' };
     }
-    const peopleLine = parts.pop();
-    const cleanedPeople = oldPartner ? stripPartnerFromPeopleLine(peopleLine, oldPartner) : peopleLine;
-    const finalPeople = newPartner ? (cleanedPeople ? `${cleanedPeople} & ${newPartner}` : newPartner) : cleanedPeople;
-    if (!finalPeople) return parts.join(' - ');
-    return `${parts.join(' - ')} - ${finalPeople}`;
+    const people = parts.pop();
+    return { prefix: parts.join(' - '), people };
+}
+
+function stripTrailingPartner(peopleLine) {
+    if (!peopleLine) return peopleLine;
+    return peopleLine.replace(/\s*[&+]\s*[^&+]+$/, '').trim();
+}
+
+function setPartnerInSummary(summary, newPartner) {
+    if (!summary) return summary;
+    const { prefix, people } = splitSummary(summary);
+    const creator = stripTrailingPartner(people);
+    const finalPeople = newPartner ? `${creator} & ${newPartner}` : creator;
+    if (!prefix) return finalPeople;
+    return finalPeople ? `${prefix} - ${finalPeople}` : prefix;
 }
 
 function getBookingDisplayLabel(booking) {
     const props = booking.extendedProperties?.private || {};
-    const partnerName = isBookingPartnerCanceled(props)
-        ? (props.partnerCanceledByName || props.partner || '')
-        : (props.partner || '');
-    const cleanedSummary = partnerName
-        ? replacePartnerInSummary(booking.summary, partnerName, isBookingPartnerCanceled(props) ? '' : partnerName)
+    const displaySummary = isBookingPartnerCanceled(props)
+        ? setPartnerInSummary(booking.summary, '')
         : booking.summary;
-    return cleanedSummary.split(' - ').slice(1).join(' - ');
+    return displaySummary.split(' - ').slice(1).join(' - ');
 }
 
 async function cancelPartnerBooking(eventId) {
@@ -475,7 +467,7 @@ async function cancelPartnerBooking(eventId) {
     if (!confirmed) return false;
     
     const canceledAt = new Date().toLocaleString('de-DE');
-    const updatedSummary = replacePartnerInSummary(booking.summary, props.partner, '');
+    const updatedSummary = setPartnerInSummary(booking.summary, '');
     const patch = {
         summary: updatedSummary,
         description: buildPartnerCancelDescription(booking.description, props.partner, canceledAt, 'Partner storniert'),
@@ -531,7 +523,7 @@ async function removePartnerByCreator(eventId) {
     }
     
     const canceledAt = new Date().toLocaleString('de-DE');
-    const updatedSummary = replacePartnerInSummary(booking.summary, props.partner, '');
+    const updatedSummary = setPartnerInSummary(booking.summary, '');
     const patch = {
         summary: updatedSummary,
         description: buildPartnerCancelDescription(booking.description, props.partner, canceledAt, 'Partner entfernt'),
@@ -1341,8 +1333,7 @@ async function confirmNewPartner() {
     const updatedDescription = sanitizeNotesDescription(booking.description || '');
 
     // Update summary to reflect current partner selection
-    const previousPartner = props.partner || props.partnerCanceledByName || '';
-    const updatedSummary = replacePartnerInSummary(booking.summary, previousPartner, newPartnerName);
+    const updatedSummary = setPartnerInSummary(booking.summary, newPartnerName);
     
     const patch = {
         summary: updatedSummary,
