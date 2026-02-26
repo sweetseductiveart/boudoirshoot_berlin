@@ -487,7 +487,13 @@ async function cancelPartnerBooking(eventId) {
     
     // Note: sendUpdates 'none' to avoid Domain-Wide Delegation requirement
     // Service account cannot send notifications without additional setup
-    return updateBookingByEventId(eventId, patch, 'none');
+    const result = await updateBookingByEventId(eventId, patch, 'none');
+    
+    if (result) {
+        await loadAllBookings();  // Refresh bookings list
+        updateAllViews();  // Update all views to reflect changes
+    }
+    return result;
 }
 
 async function removePartnerByCreator(eventId) {
@@ -546,6 +552,11 @@ async function removePartnerByCreator(eventId) {
     // Service account cannot send notifications without additional setup
     const result = await updateBookingByEventId(eventId, patch, 'none');
     console.log('📥 Update result:', result);
+    
+    if (result) {
+        await loadAllBookings();  // Refresh bookings list
+        updateAllViews();  // Update all views to reflect changes
+    }
     return result;
 }
 
@@ -1355,7 +1366,9 @@ async function confirmNewPartner() {
     const result = await updateBookingByEventId(eventId, patch, 'none');
     
     if (result) {
+        await loadAllBookings();  // Refresh bookings list
         showBookingModal(eventId);  // Refresh modal
+        updatePersonalView();  // Refresh personal view to show updated booking
         showError('mainError', `Partner ${newPartnerName ? "'" + newPartnerName + "'" : 'entfernt'} eingestellt`);
     }
 }
