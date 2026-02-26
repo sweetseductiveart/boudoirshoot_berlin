@@ -138,6 +138,7 @@ async function restoreSessionFromStorage() {
             
             // Repopulate user selector now that authorized users are loaded
             populateUserSelector();
+            populateImpersonateSelector();
             
             // Restore view from URL or use default
             restoreViewFromURL();
