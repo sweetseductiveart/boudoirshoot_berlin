@@ -47,6 +47,7 @@ function initializeUI() {
     // Booking details modal
     document.getElementById('deleteBooking').addEventListener('click', deleteBooking);
     document.getElementById('cancelPartner').addEventListener('click', cancelPartnerBookingFromModal);
+    document.getElementById('confirmNewPartner').addEventListener('click', confirmNewPartner);
     
     // New booking modal
     document.getElementById('submitNewBooking').addEventListener('click', submitNewBooking);
@@ -1183,16 +1184,39 @@ function showBookingModal(eventId) {
     const isPartner = isCurrentUserPartner(props);
     const isPartnerCanceled = isBookingPartnerCanceled(props);
     const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
+    const currentPartnerName = props.partner && !isPartnerCanceled ? props.partner : '';
     
     const modal = document.getElementById('bookingModal');
     const body = document.getElementById('modalBody');
+    
+    // Store eventId for later use
+    body.dataset.eventId = eventId;
+    
+    // Build partner selection UI (only for creator if partner is removed/empty)
+    let partnerUI = `<p><strong>Partner:</strong> ${currentPartnerName || '-'}</p>`;
+    if (isCreator && isPartnerCanceled) {
+        const partnerOptions = BOOKING_CONFIG.AUTHORIZED_USERS
+            .filter(u => u.email !== props.userEmail)
+            .map(u => `<option value="${u.email}">${u.name}</option>`)
+            .join('');
+        
+        partnerUI = `
+            <div class="form-group">
+                <label><strong>Partner auswählen:</strong></label>
+                <select id="newPartnerSelect" class="form-select">
+                    <option value="">Kein Partner</option>
+                    ${partnerOptions}
+                </select>
+            </div>
+        `;
+    }
     
     body.innerHTML = `
         <p><strong>Studio:</strong> ${studio?.name}</p>
         <p><strong>Zeit:</strong> ${startTime}</p>
         <p><strong>Dauer:</strong> ${props.duration} Minuten</p>
         <p><strong>Fotograf/in:</strong> ${props.userEmail}</p>
-        <p><strong>Partner:</strong> ${props.partner || '-'}</p>
+        ${partnerUI}
         <p><strong>Status:</strong> ${statusLabel}</p>
         <p><strong>Notizen:</strong> ${booking.description || '-'}</p>
     `;
@@ -1212,11 +1236,74 @@ function showBookingModal(eventId) {
         cancelBtn.classList.add('hidden');
     }
     
+    // Show confirm button only if creator and partner was just removed
+    const confirmBtn = document.getElementById('confirmNewPartner');
+    if (confirmBtn) {
+        confirmBtn.dataset.eventId = eventId;
+        confirmBtn.classList.toggle('hidden', !(isCreator && isPartnerCanceled));
+    }
+    
     modal.classList.remove('hidden');
 }
 
 function closeBookingModal() {
     document.getElementById('bookingModal').classList.add('hidden');
+}
+
+async function confirmNewPartner() {
+    const eventId = document.getElementById('confirmNewPartner').dataset.eventId;
+    const newPartnerEmail = document.getElementById('newPartnerSelect')?.value;
+    
+    if (!eventId) return;
+    
+    const booking = allBookings.find(b => b.id === eventId);
+    if (!booking) return;
+    
+    const props = booking.extendedProperties?.private || {};
+    const isCreator = props.userEmail === currentUser?.email;
+    if (!isCreator) {
+        showError('mainError', 'Nur der Ersteller kann den Partner ändern.');
+        return;
+    }
+    
+    // Find partner name if selected
+    let newPartnerName = '';
+    if (newPartnerEmail) {
+        const partnerUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => u.email === newPartnerEmail);
+        newPartnerName = partnerUser?.name || newPartnerEmail;
+    }
+    
+    // Build new description with partner update
+    const description = booking.description || '';
+    let updatedDescription = description;
+    if (newPartnerName) {
+        updatedDescription = `Fotograf/in: ${props.userEmail}\nPartner: ${newPartnerName}\n\n${description}`;
+    } else {
+        updatedDescription = description;
+    }
+    
+    const patch = {
+        description: updatedDescription,
+        extendedProperties: {
+            private: {
+                ...props,
+                partner: newPartnerName,
+                partnerEmail: newPartnerEmail,
+                partnerCanceled: 'false',  // Reset partner canceled status
+                partnerCanceledByEmail: undefined,
+                partnerCanceledByName: undefined,
+                partnerCanceledAt: undefined
+            }
+        }
+    };
+    
+    console.log('📤 Setting new partner:', newPartnerName);
+    const result = await updateBookingByEventId(eventId, patch, 'none');
+    
+    if (result) {
+        showBookingModal(eventId);  // Refresh modal
+        showError('mainError', `Partner ${newPartnerName ? "'" + newPartnerName + "'" : 'entfernt'} eingestellt`);
+    }
 }
 
 function openNewBookingModal(studioId = null, startTime = null) {
