@@ -581,20 +581,20 @@ body {
     border-right: 2px solid var(--line);
     border-top: 4px solid rgba(107, 141, 214, 0.5);
     z-index: 100;
-    min-height: 86px;
+    min-height: 66px;
 }
 
 .calendar-time-slot {
     background: var(--bg);
     color: var(--text);
-    padding: 16px 10px;
+    padding: 12px 8px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     font-size: 12px;
-    min-height: 90px;
+    min-height: 70px;
     border-right: 2px solid var(--line);
     border-bottom: 2px solid var(--line);
 }
