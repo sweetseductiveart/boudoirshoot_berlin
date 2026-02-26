@@ -276,64 +276,6 @@ async function loadAllBookings() {
     }
 }
 
-async function createBooking(studio, startTime, duration, partner, notes) {
-    if (!currentUser) {
-        showError('mainError', 'Sie müssen angemeldet sein, um eine Buchung zu erstellen.');
-        return false;
-    }
-    
-    try {
-        showLoading(true);
-        
-        const startDateTime = new Date(`${BOOKING_CONFIG.EVENT_DATE}T${startTime}:00`);
-        const endTime = addMinutes(startDateTime, duration);
-        
-        const event = {
-            summary: `${studio.name} - ${currentUser.name}${partner ? ' + ' + partner : ''}`,
-            description: `Fotograf/in: ${currentUser.name}\nPartner: ${partner || 'Keine Angabe'}\nNoten: ${notes || '-'}`,
-            start: { dateTime: startDateTime.toISOString(), timeZone: 'Europe/Zurich' },
-            end: { dateTime: endTime.toISOString(), timeZone: 'Europe/Zurich' },
-            extendedProperties: {
-                private: {
-                    studioId: studio.id,
-                    userEmail: currentUser.email,
-                    partner: partner || '',
-                    duration: duration.toString(),
-                    partnerCanceled: 'false'
-                }
-            }
-        };
-        
-        const url = `${BOOKING_CONFIG.VERCEL_API_URL}/create-booking`;
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ event })
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || 'Failed to create booking');
-        }
-        
-        console.log('✅ Booking created successfully');
-        await loadAllBookings();
-        updateAllViews();
-        showLoading(false);
-        
-        return true;
-        
-    } catch (error) {
-        console.error('❌ Error creating booking:', error);
-        showError('mainError', 'Fehler beim Erstellen der Buchung. Kalender-Zugriff evtl. nicht konfiguriert.');
-        showLoading(false);
-        return false;
-    }
-}
-
 async function deleteBookingByEventId(eventId) {
     if (!currentUser) {
         showError('mainError', 'Sie müssen angemeldet sein.');
