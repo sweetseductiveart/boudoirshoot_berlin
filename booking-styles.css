@@ -1413,6 +1413,16 @@ body {
 }
 
 @media (max-width: 768px) {
+    .modal-footer {
+        flex-wrap: wrap;
+        justify-content: stretch;
+    }
+
+    .modal-footer .btn {
+        min-width: 0;
+        flex: 1 1 calc(50% - 6px);
+    }
+
     .studios-grid {
         grid-template-columns: 1fr;
         margin: 0 16px;
@@ -1485,7 +1495,7 @@ body {
         border-bottom: none;
         justify-content: flex-start;
         gap: 6px;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         padding-bottom: 0;
     }
 
@@ -1497,6 +1507,9 @@ body {
     .bookings-table td:last-child .btn {
         padding: 7px 10px;
         font-size: 11px;
+        flex: 1 1 auto;
+        min-width: 80px;
+        white-space: nowrap;
     }
 
     .bookings-table td::before {
