@@ -30,10 +30,23 @@ function initializeUI() {
     document.getElementById('newBookingButton').addEventListener('click', () => openNewBookingModal());
     
     // Navigation
+    const navToggle = document.getElementById('navToggle');
+    const mainNav = document.getElementById('mainNav');
+    if (navToggle && mainNav) {
+        navToggle.addEventListener('click', () => {
+            const isOpen = mainNav.classList.toggle('is-open');
+            navToggle.setAttribute('aria-expanded', String(isOpen));
+        });
+    }
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             switchView(btn.dataset.view);
             updateURLHash();
+            if (mainNav && navToggle && window.innerWidth <= 820) {
+                mainNav.classList.remove('is-open');
+                navToggle.setAttribute('aria-expanded', 'false');
+            }
         });
     });
     
@@ -1082,6 +1095,8 @@ function updatePersonalView() {
     // Create table body
     const tbody = document.createElement('tbody');
     
+    const tableLabels = ['Studio', 'Zeit', 'Dauer', 'Partner', 'Status', 'Aktion'];
+
     userBookings.forEach(booking => {
         const props = booking.extendedProperties?.private || {};
         const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
@@ -1109,6 +1124,12 @@ function updatePersonalView() {
             ` : '-'}
             </td>
         `;
+
+        Array.from(row.children).forEach((cell, index) => {
+            if (tableLabels[index]) {
+                cell.setAttribute('data-label', tableLabels[index]);
+            }
+        });
         
         const detailsBtn = row.querySelector('[data-action="details"]');
         if (detailsBtn) {

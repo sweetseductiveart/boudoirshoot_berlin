@@ -25,13 +25,18 @@
         <header class="app-header">
             <div class="header-content">
                 <h1>Studio Buchungssystem</h1>
+                <button id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="mainNav" aria-label="Navigation umschalten">
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                    <span class="nav-toggle__bar"></span>
+                </button>
                 <div class="user-info">
                     <button id="newBookingButton" class="btn btn-primary">+ Neue Buchung</button>
                     <span id="userName" class="user-name"></span>
                     <button id="logoutButton" class="btn btn-secondary">Abmelden</button>
                 </div>
             </div>
-            <nav class="main-nav">
+            <nav class="main-nav" id="mainNav">
                 <button class="nav-btn active" data-view="overview">Gesamtübersicht</button>
                 <button class="nav-btn" data-view="personal">Meine Buchungen</button>
                 <button class="nav-btn" data-view="studio">Studio-Ansicht</button>

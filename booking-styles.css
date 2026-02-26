@@ -178,6 +178,36 @@ body {
     z-index: 100;
 }
 
+.nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.05);
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.nav-toggle:hover {
+    background: rgba(255,255,255,.10);
+    border-color: rgba(255,255,255,.22);
+}
+
+.nav-toggle__bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 999px;
+}
+
+.nav-toggle__bar + .nav-toggle__bar {
+    margin-top: 4px;
+}
+
 .header-content {
     display: flex;
     justify-content: space-between;
@@ -256,6 +286,50 @@ body {
     overflow: hidden;
     box-sizing: border-box;
     min-height: 0;
+}
+
+/* ============================================
+   MOBILE NAV COLLAPSE
+   ============================================ */
+
+@media (max-width: 820px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .nav-toggle {
+        display: inline-flex;
+    }
+
+    .user-info {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .main-nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        padding: 0 20px;
+        transition: max-height 0.2s ease, opacity 0.2s ease;
+    }
+
+    .main-nav.is-open {
+        max-height: 280px;
+        opacity: 1;
+        padding-bottom: 16px;
+    }
+
+    .nav-btn {
+        width: 100%;
+        text-align: left;
+    }
 }
 
 .view-container.active {
@@ -744,6 +818,10 @@ body {
 
 .bookings-list {
     padding: 20px;
+}
+
+.bookings-table td::before {
+    content: '';
 }
 
 .no-data {
@@ -1237,16 +1315,6 @@ body {
 }
 
 @media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    .main-nav {
-        flex-wrap: wrap;
-    }
-
     .studios-grid {
         grid-template-columns: 1fr;
     }
@@ -1275,6 +1343,55 @@ body {
     .detail-row {
         grid-template-columns: 1fr;
     }
+
+    .bookings-list {
+        padding: 16px;
+    }
+
+    .bookings-table,
+    .bookings-table thead,
+    .bookings-table tbody,
+    .bookings-table tr,
+    .bookings-table th,
+    .bookings-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .bookings-table thead {
+        display: none;
+    }
+
+    .bookings-table tr {
+        margin-bottom: 14px;
+        background: rgba(255,255,255,.03);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .bookings-table td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 6px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .bookings-table td:last-child {
+        border-bottom: none;
+        justify-content: flex-start;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .bookings-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--muted);
+        min-width: 110px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1293,6 +1410,31 @@ body {
     .nav-btn {
         font-size: 12px;
         padding: 8px 12px;
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        height: auto;
+        overflow: auto;
+    }
+
+    #mainInterface {
+        height: auto;
+        min-height: 100dvh;
+    }
+
+    .view-container {
+        overflow: visible;
+    }
+
+    .studio-content,
+    .schedule-grid {
+        overflow: visible;
+    }
+
+    .time-slots {
+        max-height: none;
     }
 }
 
@@ -1317,11 +1459,11 @@ body {
         justify-content: space-between;
         gap: 10px;
         padding: 14px;
-        background: white;
-        border-bottom: 1px solid #E0E0E0;
+        background: var(--panelA);
+        border-bottom: 1px solid var(--line);
         flex-wrap: wrap;
         position: relative;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: var(--shadow);
     }
     
     .nav-arrow-btn {
@@ -1359,14 +1501,14 @@ body {
     
     .mobile-studio-title strong {
         display: block;
-        color: #333;
+        color: var(--text);
         font-size: 15px;
         font-weight: 600;
     }
     
     .mobile-studio-title span {
         font-size: 12px;
-        color: #666;
+        color: var(--muted);
     }
     
     .mobile-progress {
@@ -1374,10 +1516,10 @@ body {
         top: 10px;
         right: 14px;
         font-size: 11px;
-        background: #F5F5F5;
+        background: rgba(255,255,255,.08);
         padding: 4px 10px;
         border-radius: 12px;
-        color: #999;
+        color: var(--muted);
         font-weight: 500;
     }
     
@@ -1386,7 +1528,7 @@ body {
         flex-direction: column;
         flex: 1;
         overflow: hidden;
-        background: white;
+        background: var(--panelA);
     }
     
     .calendar-mobile-grid {
@@ -1394,7 +1536,7 @@ body {
         flex: 1;
         overflow-y: auto;
         gap: 0;
-        background: white;
+        background: var(--panelA);
         padding: 0;
     }
     
@@ -1402,8 +1544,8 @@ body {
         display: flex;
         flex-direction: column;
         flex: 0 0 65px;
-        background: #FAFAFA;
-        border-right: 1px solid #E0E0E0;
+        background: var(--panelB);
+        border-right: 1px solid var(--line);
     }
     
     .mobile-time-header {
@@ -1413,9 +1555,9 @@ body {
         justify-content: center;
         font-weight: 600;
         font-size: 12px;
-        background: white;
-        color: #333;
-        border-bottom: 2px solid #E0E0E0;
+        background: var(--panelA);
+        color: var(--text);
+        border-bottom: 2px solid var(--line);
     }
     
     .mobile-time-slot {
@@ -1424,17 +1566,17 @@ body {
         align-items: center;
         justify-content: center;
         font-size: 11px;
-        border-bottom: 1px solid #F0F0F0;
-        background: #FAFAFA;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--panelB);
         font-weight: 500;
-        color: #333;
+        color: var(--text);
     }
     
     .calendar-mobile-studio-col {
         display: flex;
         flex-direction: column;
         flex: 1;
-        background: white;
+        background: var(--panelA);
     }
     
     .mobile-studio-header {
@@ -1445,12 +1587,12 @@ body {
         font-weight: 600;
         font-size: 13px;
         border-top: none;
-        border-bottom: 2px solid #E0E0E0;
-        background: white;
+        border-bottom: 2px solid var(--line);
+        background: var(--panelA);
         padding: 0 8px;
         text-align: center;
         word-break: break-word;
-        color: #333;
+        color: var(--text);
     }
     
     .calendar-mobile-cell {
@@ -1459,8 +1601,8 @@ body {
         align-items: center;
         justify-content: center;
         border-left: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
         padding: 10px 5px;
         cursor: pointer;
         transition: background 0.12s ease;
