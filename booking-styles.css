@@ -1041,6 +1041,10 @@ body {
     font-size: 10px;
 }
 
+.personal-calendar-booking--compact {
+    gap: 1px;
+}
+
 .personal-calendar-booking-title {
     font-weight: 700;
     color: var(--text);
@@ -1680,8 +1684,8 @@ body {
     }
 
     .bookings-list.personal-bookings--calendar {
-        padding: 10px;
-        margin: 0 16px;
+        padding: 6px 4px;
+        margin: 0;
     }
 
     .personal-calendar-view {
@@ -1690,7 +1694,7 @@ body {
     }
 
     .personal-calendar-grid {
-        grid-template-columns: 52px minmax(0, 1fr);
+        grid-template-columns: 46px minmax(0, 1fr);
     }
 
     .personal-calendar-time-col,
@@ -1732,6 +1736,41 @@ body {
 }
 
 @media (max-width: 480px) {
+    #personalView {
+        padding: 8px 6px;
+    }
+
+    #personalView .view-header {
+        padding: 8px 4px 0 4px;
+    }
+
+    .bookings-list.personal-bookings--calendar {
+        padding: 4px 0;
+        margin: 0;
+    }
+
+    .personal-calendar-cell {
+        padding: 3px;
+    }
+
+    .personal-calendar-booking {
+        padding: 3px;
+    }
+
+    .personal-calendar-booking-title {
+        font-size: 10px;
+    }
+
+    .personal-calendar-booking-meta,
+    .personal-calendar-booking-detail {
+        font-size: 8px;
+    }
+
+    .personal-calendar-booking-actions .btn-small {
+        padding: 2px 6px;
+        font-size: 8px;
+    }
+
     .view-container {
         padding: 15px;
     }

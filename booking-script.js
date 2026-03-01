@@ -1534,19 +1534,30 @@ function updatePersonalCalendarView() {
             const duration = parseInt(props.duration || 30, 10);
             const creatorEmail = getCreatorEmail(booking, props);
             const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
-            const summaryPrefix = (booking.summary || '').split(' - ')[0] || '';
-            const studioName = studio?.name || props.studioName || booking.location || summaryPrefix || 'Unbekannt';
+            const summaryText = (booking.summary || '').trim();
+            const summaryPrefix = summaryText.includes(' - ') ? summaryText.split(' - ')[0].trim() : '';
+            const summaryStudioName = summaryPrefix.toLowerCase().includes('studio') ? summaryPrefix : '';
+            const studioName = studio?.name || props.studioName || booking.location || summaryStudioName || 'Unbekanntes Studio';
             const partner = getDisplayNameByEmail(props.partnerEmail) || props.partner || '-';
             const partnerStatus = getPartnerStatusLabel(props);
-            const partnerStatusLine = partnerStatus ? `<div class="personal-calendar-booking-detail">${partnerStatus}</div>` : '';
+            const details = [
+                `Partner: ${partner}`,
+                `${isCreator ? 'Meine Buchung' : 'Als Partner'}`
+            ];
+            if (partnerStatus) {
+                details.push(partnerStatus);
+            }
+            const maxDetails = duration === 60 ? 3 : 1;
+            const detailsHtml = details
+                .slice(0, maxDetails)
+                .map(detail => `<div class="personal-calendar-booking-detail">${detail}</div>`)
+                .join('');
 
             cell.innerHTML = `
-                <div class="personal-calendar-booking ${duration === 60 ? 'personal-calendar-booking--double' : ''}">
+                <div class="personal-calendar-booking ${duration === 60 ? 'personal-calendar-booking--double' : 'personal-calendar-booking--compact'}">
                     <div class="personal-calendar-booking-title">${studioName}</div>
                     <div class="personal-calendar-booking-meta"><strong>${slot}</strong> (${duration}min)</div>
-                    <div class="personal-calendar-booking-detail">Partner: ${partner}</div>
-                    <div class="personal-calendar-booking-detail">${isCreator ? 'Meine Buchung' : 'Als Partner'}</div>
-                    ${partnerStatusLine}
+                    ${detailsHtml}
                     <div class="personal-calendar-booking-actions">
                         <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
                     </div>
