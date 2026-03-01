@@ -650,8 +650,8 @@ body {
 }
 
 .calendar-studio-cell.duration-60 {
-    min-height: 142px;
-    height: 142px;
+    min-height: 162px;
+    height: 162px;
 }
 
 .calendar-studio-cell.available {
