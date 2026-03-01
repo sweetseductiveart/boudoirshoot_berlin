@@ -182,15 +182,32 @@ async function loadAuthorizationConfig() {
         }
         
         const data = await response.json();
+        console.log('📥 API Response:', data);
         
         if (!data.success) {
             throw new Error(data.error || 'Unknown error');
         }
         
+        // Validate AUTHORIZED_USERS is an array
+        console.log('📋 AUTHORIZED_USERS type:', typeof data.AUTHORIZED_USERS);
+        console.log('📋 Is array?', Array.isArray(data.AUTHORIZED_USERS));
+        
+        if (!Array.isArray(data.AUTHORIZED_USERS)) {
+            console.error('❌ AUTHORIZED_USERS is not an array:', data.AUTHORIZED_USERS);
+            throw new Error('Invalid AUTHORIZED_USERS format from API');
+        }
+        
         // Store in config
         BOOKING_CONFIG.AUTHORIZED_USERS = data.AUTHORIZED_USERS;
+        
+        // Update RULES from server config if provided
+        if (data.CONFIG && data.CONFIG.ALLOW_NON_ADMIN_MODIFICATIONS !== undefined) {
+            BOOKING_CONFIG.RULES.ALLOW_NON_ADMIN_MODIFICATIONS = data.CONFIG.ALLOW_NON_ADMIN_MODIFICATIONS;
+        }
+        
         console.log('✅ Authorization config loaded successfully');
         console.log(`📋 ${BOOKING_CONFIG.AUTHORIZED_USERS.length} authorized users loaded`);
+        console.log(`🔧 ALLOW_NON_ADMIN_MODIFICATIONS: ${BOOKING_CONFIG.RULES.ALLOW_NON_ADMIN_MODIFICATIONS}`);
         
         return true;
     } catch (error) {
@@ -379,6 +396,21 @@ async function deleteBookingByEventId(eventId) {
         showError('mainError', 'Sie müssen angemeldet sein.');
         return false;
     }
+
+    // Find the booking to check ownership
+    const booking = allBookings.find(b => b.id === eventId);
+    if (!booking) {
+        showError('mainError', 'Buchung nicht gefunden.');
+        return false;
+    }
+
+    const props = booking.extendedProperties?.private || {};
+    const bookingUserEmail = props.userEmail || booking.creator?.email;
+    
+    if (!canModifyBooking(bookingUserEmail)) {
+        showError('mainError', 'Sie können nur Ihre eigenen Buchungen löschen.');
+        return false;
+    }
     
     try {
         showLoading(true);
@@ -390,7 +422,10 @@ async function deleteBookingByEventId(eventId) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ eventId })
+            body: JSON.stringify({ 
+                eventId,
+                userEmail: currentUser.email 
+            })
         });
         
         if (!response.ok) {
@@ -418,6 +453,21 @@ async function updateBookingByEventId(eventId, patch, sendUpdates = 'none') {
         showError('mainError', 'Sie müssen angemeldet sein.');
         return false;
     }
+
+    // Find the booking to check ownership
+    const booking = allBookings.find(b => b.id === eventId);
+    if (!booking) {
+        showError('mainError', 'Buchung nicht gefunden.');
+        return false;
+    }
+
+    const props = booking.extendedProperties?.private || {};
+    const bookingUserEmail = props.userEmail || booking.creator?.email;
+    
+    if (!canModifyBooking(bookingUserEmail)) {
+        showError('mainError', 'Sie können nur Ihre eigenen Buchungen ändern.');
+        return false;
+    }
     
     try {
         showLoading(true);
@@ -433,7 +483,12 @@ async function updateBookingByEventId(eventId, patch, sendUpdates = 'none') {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ eventId, patch, sendUpdates })
+            body: JSON.stringify({ 
+                eventId, 
+                patch, 
+                sendUpdates,
+                userEmail: currentUser.email 
+            })
         });
         
         console.log('  Response status:', response.status);
@@ -489,6 +544,20 @@ function getCurrentUserRecord() {
 function isCurrentUserAdmin() {
     const record = getCurrentUserRecord();
     return record?.isAdmin === true;
+}
+
+// Check if current user can CREATE new bookings (Go-Live Toggle)
+function canCurrentUserCreateBookings() {
+    if (BOOKING_CONFIG.RULES?.ALLOW_NON_ADMIN_MODIFICATIONS === false) {
+        return isCurrentUserAdmin();
+    }
+    return true;
+}
+
+// Check if user can modify a specific booking (owner or admin)
+function canModifyBooking(bookingUserEmail) {
+    if (isCurrentUserAdmin()) return true;
+    return normalizeEmail(currentUser?.email) === normalizeEmail(bookingUserEmail);
 }
 
 function getDisplayNameByEmail(email) {
@@ -1056,8 +1125,10 @@ function updateOverviewView() {
                     cell.addEventListener('click', () => showBookingModal(booking.id));
                 } else {
                     cell.classList.add('available');
-                    cell.style.cursor = 'pointer';
-                    cell.addEventListener('click', () => openNewBookingModal(currentStudio.id, slot));
+                    if (canCurrentUserCreateBookings()) {
+                        cell.style.cursor = 'pointer';
+                        cell.addEventListener('click', () => openNewBookingModal(currentStudio.id, slot));
+                    }
                 }
                 
                 studioColumn.appendChild(cell);
@@ -1204,8 +1275,10 @@ function updateOverviewView() {
                 } else {
                     cell.classList.add('available');
                     cell.style.backgroundColor = studio.color + '08';
-                    cell.style.cursor = 'pointer';
-                    cell.addEventListener('click', () => openNewBookingModal(studio.id, slot));
+                    if (canCurrentUserCreateBookings()) {
+                        cell.style.cursor = 'pointer';
+                        cell.addEventListener('click', () => openNewBookingModal(studio.id, slot));
+                    }
                     studioColumn.appendChild(cell);
                 }
             });
@@ -1294,12 +1367,13 @@ function updatePersonalView() {
             const creatorEmail = getCreatorEmail(booking, props);
             const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
             const isAdmin = effectiveUser.isAdmin;
+            const canModify = isCreator || isAdmin;
             const isPartner = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail) || props.partner === selectedUserName;
             const isPartnerCanceled = isBookingPartnerCanceled(props);
             const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
             const canShowActions = normalizeEmail(selectedEmail) === normalizeEmail(effectiveUser.email) || isAdmin;
-            const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
-            const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
+            const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled && canModify;
+            const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled && canModify;
             
             // For partner bookings, show who booked them
             const partnerOrCreatorDisplay = isOwnBookings 
@@ -1315,7 +1389,7 @@ function updatePersonalView() {
                 <td data-label="${tableLabels[4]}">${statusLabel}</td>
                 <td data-label="${tableLabels[5]}">${canShowActions ? `
                     <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
-                    ${(isCreator || isAdmin) ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Löschen</button>` : ''}
+                    ${(isCreator || isAdmin) && canModify ? `<button class="btn btn-small btn-danger" data-action="delete" data-event="${booking.id}">Löschen</button>` : ''}
                     ${canRemovePartner ? `<button class="btn btn-small btn-warning" data-action="remove-partner" data-event="${booking.id}">Partner entfernen</button>` : ''}
                     ${canCancelPartner ? `<button class="btn btn-small btn-warning" data-action="cancel-partner" data-event="${booking.id}">Partner stornieren</button>` : ''}
                 ` : '-'}
@@ -1361,6 +1435,7 @@ function updateStudioView() {
     const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === selectedStudioId);
 
     const effectiveUser = getEffectiveUserContext();
+    const canCreate = canCurrentUserCreateBookings();
     
     if (!studio) return;
     
@@ -1459,7 +1534,7 @@ function updateStudioView() {
             // Existing booking - show details
             slot.style.cursor = 'pointer';
             slot.addEventListener('click', () => showBookingModal(bookingId));
-        } else if (studioId && time) {
+        } else if (studioId && time && canCreate) {
             // Available slot - open booking modal
             slot.style.cursor = 'pointer';
             slot.addEventListener('click', () => openNewBookingModal(studioId, time));
@@ -1486,6 +1561,7 @@ function showBookingModal(eventId) {
     const effectiveUser = getEffectiveUserContext();
     const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(effectiveUser.email);
     const isAdmin = effectiveUser.isAdmin;
+    const canModify = isCreator || isAdmin;
     const isPartner = isCurrentUserPartner(props);
     const isPartnerCanceled = isBookingPartnerCanceled(props);
     const statusLabel = getPartnerStatusLabel(props) || 'Aktiv';
@@ -1499,7 +1575,7 @@ function showBookingModal(eventId) {
     
     // Build partner selection UI (only for creator if partner is removed/empty)
     let partnerUI = `<p><strong>Partner:</strong> ${currentPartnerName || '-'}</p>`;
-    if ((isCreator || isAdmin) && isPartnerCanceled) {
+    if ((isCreator || isAdmin) && isPartnerCanceled && canModify) {
         const partnerOptions = BOOKING_CONFIG.AUTHORIZED_USERS
             .filter(u => u.email !== props.userEmail)
             .map(u => `<option value="${u.email}">${u.name}</option>`)
@@ -1532,13 +1608,13 @@ function showBookingModal(eventId) {
     
     const deleteBtn = document.getElementById('deleteBooking');
     deleteBtn.dataset.eventId = eventId;
-    deleteBtn.classList.toggle('hidden', !(isCreator || isAdmin));
+    deleteBtn.classList.toggle('hidden', !(isCreator || isAdmin) || !canModify);
     
     const cancelBtn = document.getElementById('cancelPartner');
     cancelBtn.dataset.eventId = eventId;
     const canRemovePartner = (isCreator || isAdmin) && !!(props.partner || props.partnerEmail) && !isPartnerCanceled;
     const canCancelPartner = !isCreator && !isAdmin && isPartner && !isPartnerCanceled;
-    if (canRemovePartner || canCancelPartner) {
+    if (canModify && (canRemovePartner || canCancelPartner)) {
         cancelBtn.textContent = (isCreator || isAdmin) ? 'Partner entfernen' : 'Partner stornieren';
         cancelBtn.classList.remove('hidden');
     } else {
@@ -1549,7 +1625,7 @@ function showBookingModal(eventId) {
     const confirmBtn = document.getElementById('confirmNewPartner');
     if (confirmBtn) {
         confirmBtn.dataset.eventId = eventId;
-        confirmBtn.classList.toggle('hidden', !((isCreator || isAdmin) && isPartnerCanceled));
+        confirmBtn.classList.toggle('hidden', !((isCreator || isAdmin) && isPartnerCanceled && canModify));
     }
     
     modal.classList.remove('hidden');
@@ -1617,6 +1693,11 @@ async function confirmNewPartner() {
 }
 
 function openNewBookingModal(studioId = null, startTime = null) {
+    if (!canCurrentUserCreateBookings()) {
+        showError('mainError', 'Das System ist derzeit gesperrt. Nur Admins können neue Buchungen erstellen.');
+        return;
+    }
+
     const modal = document.getElementById('newBookingModal');
     
     // Populate studio dropdown
@@ -1749,6 +1830,11 @@ function populatePartnerDropdown() {
 }
 
 async function submitNewBooking() {
+    if (!canCurrentUserCreateBookings()) {
+        alert('Das System ist derzeit gesperrt. Nur Admins können neue Buchungen erstellen.');
+        return;
+    }
+
     const studioId = document.getElementById('bookingStudio').value;
     const startTime = document.getElementById('bookingStartTime').value;
     const duration = parseInt(document.getElementById('bookingDuration').value);
@@ -1819,7 +1905,10 @@ async function submitNewBooking() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ event })
+            body: JSON.stringify({ 
+                event,
+                userEmail: currentUser.email 
+            })
         });
         
         if (!response.ok) {
