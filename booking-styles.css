@@ -932,6 +932,147 @@ body {
     padding: 40px;
 }
 
+.personal-view-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.personal-view-toggle {
+    display: flex;
+    gap: 6px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 4px;
+    background: var(--panelB);
+}
+
+.personal-toggle-btn {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.personal-toggle-btn:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.personal-toggle-btn.is-active {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.bookings-list.personal-bookings--calendar {
+    padding: 16px;
+}
+
+.personal-calendar-view {
+    background: var(--panelA);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    overflow: auto;
+    max-height: calc(100vh - 290px);
+    min-height: 380px;
+}
+
+.personal-calendar-grid {
+    display: grid;
+    grid-template-columns: 68px minmax(0, 1fr);
+    min-width: 0;
+}
+
+.personal-calendar-time-col {
+    display: grid;
+    grid-auto-rows: 80px;
+    background: var(--bg);
+    border-right: 2px solid var(--line);
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+
+.personal-calendar-time-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--faint);
+    border-bottom: 1px solid var(--line);
+    padding: 0 4px;
+    text-align: center;
+}
+
+.personal-calendar-bookings-col {
+    display: grid;
+    grid-auto-rows: 80px;
+    min-width: 0;
+}
+
+.personal-calendar-cell {
+    border-bottom: 1px solid var(--line);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+}
+
+.personal-calendar-cell--double {
+    grid-row: span 2;
+}
+
+.personal-calendar-booking {
+    background: linear-gradient(135deg, rgba(107, 141, 214, 0.2), rgba(139, 120, 238, 0.1));
+    border: 1px solid var(--primary-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 8px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    font-size: 10px;
+}
+
+.personal-calendar-booking-title {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.personal-calendar-booking-meta {
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.personal-calendar-booking-detail {
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.personal-calendar-booking-actions {
+    margin-top: auto;
+}
+
+.personal-calendar-booking-actions .btn-small {
+    padding: 4px 8px;
+    font-size: 10px;
+}
+
 /* ============================================
    STUDIO VIEW
    ============================================ */
@@ -1521,6 +1662,72 @@ body {
         color: var(--muted);
         min-width: 90px;
         font-size: 11px;
+    }
+
+    .personal-view-controls {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .personal-view-toggle {
+        width: 100%;
+    }
+
+    .personal-toggle-btn {
+        flex: 1;
+    }
+
+    .bookings-list.personal-bookings--calendar {
+        padding: 10px;
+        margin: 0 16px;
+    }
+
+    .personal-calendar-view {
+        max-height: calc(100vh - 250px);
+        min-height: 300px;
+    }
+
+    .personal-calendar-grid {
+        grid-template-columns: 52px minmax(0, 1fr);
+    }
+
+    .personal-calendar-time-col,
+    .personal-calendar-bookings-col {
+        grid-auto-rows: 70px;
+    }
+
+    .personal-calendar-time-slot {
+        font-size: 9px;
+        padding: 0 2px;
+    }
+
+    .personal-calendar-cell {
+        padding: 4px;
+    }
+
+    .personal-calendar-booking {
+        padding: 4px;
+        gap: 1px;
+        font-size: 9px;
+    }
+
+    .personal-calendar-booking-title {
+        font-size: 11px;
+    }
+
+    .personal-calendar-booking-meta {
+        font-size: 10px;
+    }
+
+    .personal-calendar-booking-detail {
+        font-size: 9px;
+    }
+
+    .personal-calendar-booking-actions .btn-small {
+        padding: 3px 6px;
+        font-size: 9px;
     }
 }
 

@@ -6,6 +6,7 @@
 let currentUser = null;
 let allBookings = [];
 let impersonatedUserEmail = null;  // For admin debugging
+let personalViewMode = 'table';
 
 // Session persistence key
 const USER_STORAGE_KEY = 'booking_system_user';
@@ -77,6 +78,19 @@ function initializeUI() {
         updatePersonalView();
         updateURLHash();
     });
+
+    document.querySelectorAll('.personal-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const nextMode = btn.dataset.personalViewMode;
+            if (nextMode !== 'table' && nextMode !== 'calendar') {
+                return;
+            }
+            personalViewMode = nextMode;
+            updatePersonalViewModeButtons();
+            updatePersonalView();
+            updateURLHash();
+        });
+    });
     
     // Admin impersonate selector
     const impersonateSelect = document.getElementById('impersonateSelect');
@@ -90,6 +104,14 @@ function initializeUI() {
     // Populate selectors
     populateStudioSelector();
     populateUserSelector();
+    updatePersonalViewModeButtons();
+}
+
+function updatePersonalViewModeButtons() {
+    document.querySelectorAll('.personal-toggle-btn').forEach(btn => {
+        const isActive = btn.dataset.personalViewMode === personalViewMode;
+        btn.classList.toggle('is-active', isActive);
+    });
 }
 
 function initializeGoogleAuth() {
@@ -906,6 +928,7 @@ function updateURLHash() {
         if (selectedUser) {
             params.set('user', selectedUser);
         }
+        params.set('mode', personalViewMode);
     }
     
     // Update URL hash without triggering page reload
@@ -921,6 +944,12 @@ function restoreViewFromURL() {
     const view = params.get('view') || 'overview';
     const studioId = params.get('studio');
     const userEmail = params.get('user');
+    const mode = params.get('mode');
+
+    if (mode === 'table' || mode === 'calendar') {
+        personalViewMode = mode;
+    }
+    updatePersonalViewModeButtons();
     
     // Switch to the view
     switchView(view);
@@ -941,6 +970,8 @@ function restoreViewFromURL() {
             userSelect.value = userEmail;
             updatePersonalView();
         }
+    } else if (view === 'personal') {
+        updatePersonalView();
     }
 }
 
@@ -1292,9 +1323,18 @@ function updateOverviewView() {
 }
 
 function updatePersonalView() {
+    updatePersonalViewModeButtons();
+    if (personalViewMode === 'calendar') {
+        return updatePersonalCalendarView();
+    }
+    return updatePersonalTableView();
+}
+
+function updatePersonalTableView() {
     const selectedEmail = document.getElementById('userSelect').value;
     const container = document.getElementById('personalBookings');
     container.innerHTML = '';
+    container.classList.remove('personal-bookings--calendar');
 
     const effectiveUser = getEffectiveUserContext();
     
@@ -1428,6 +1468,106 @@ function updatePersonalView() {
     // Render partner bookings
     const partnerSection = renderBookingsTable(partnerBookings, 'Als Partner gebucht', false);
     if (partnerSection) container.appendChild(partnerSection);
+}
+
+function updatePersonalCalendarView() {
+    const selectedEmail = document.getElementById('userSelect').value;
+    const container = document.getElementById('personalBookings');
+    container.innerHTML = '';
+    container.classList.add('personal-bookings--calendar');
+
+    const selectedUser = getAuthorizedUserByEmail(selectedEmail);
+    const selectedUserName = selectedUser?.name || '';
+
+    const userBookings = allBookings.filter(booking => {
+        const props = booking.extendedProperties?.private || {};
+        const creatorEmail = getCreatorEmail(booking, props);
+        const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
+        const isPartnerEmail = normalizeEmail(props.partnerEmail || '') === normalizeEmail(selectedEmail);
+        const isPartnerName = props.partner === selectedUserName;
+        return isCreator || isPartnerEmail || isPartnerName;
+    });
+
+    if (userBookings.length === 0) {
+        container.innerHTML = '<p class="no-data">Keine Buchungen vorhanden</p>';
+        return;
+    }
+
+    const slots = generateTimeSlots(BOOKING_CONFIG.EVENT_START_TIME, BOOKING_CONFIG.EVENT_END_TIME, 30);
+    const renderedSlots = new Set();
+
+    const calendarRoot = document.createElement('div');
+    calendarRoot.className = 'personal-calendar-view';
+
+    const calendarGrid = document.createElement('div');
+    calendarGrid.className = 'personal-calendar-grid';
+
+    const timeColumn = document.createElement('div');
+    timeColumn.className = 'personal-calendar-time-col';
+
+    slots.forEach(slot => {
+        const timeSlot = document.createElement('div');
+        timeSlot.className = 'personal-calendar-time-slot';
+        timeSlot.textContent = slot;
+        timeColumn.appendChild(timeSlot);
+    });
+
+    const bookingsColumn = document.createElement('div');
+    bookingsColumn.className = 'personal-calendar-bookings-col';
+
+    slots.forEach((slot, slotIndex) => {
+        if (renderedSlots.has(slot)) {
+            return;
+        }
+
+        const cell = document.createElement('div');
+        cell.className = 'personal-calendar-cell';
+
+        const booking = userBookings.find(entry => {
+            const startTime = new Date(entry.start.dateTime).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            return startTime === slot;
+        });
+
+        if (booking) {
+            const props = booking.extendedProperties?.private || {};
+            const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
+            const duration = parseInt(props.duration || 30, 10);
+            const creatorEmail = getCreatorEmail(booking, props);
+            const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
+            const partner = props.partner || props.partnerEmail || '-';
+
+            cell.innerHTML = `
+                <div class="personal-calendar-booking ${duration === 60 ? 'personal-calendar-booking--double' : ''}">
+                    <div class="personal-calendar-booking-title">${studio?.name || 'Unbekannt'}</div>
+                    <div class="personal-calendar-booking-meta"><strong>${slot}</strong> (${duration}min)</div>
+                    <div class="personal-calendar-booking-detail">Partner: ${partner}</div>
+                    <div class="personal-calendar-booking-detail">${isCreator ? 'Meine Buchung' : 'Als Partner'}</div>
+                    <div class="personal-calendar-booking-actions">
+                        <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
+                    </div>
+                </div>
+            `;
+
+            const detailsBtn = cell.querySelector('[data-action="details"]');
+            if (detailsBtn) {
+                detailsBtn.addEventListener('click', () => showBookingModal(booking.id));
+            }
+
+            if (duration === 60) {
+                cell.classList.add('personal-calendar-cell--double');
+                if (slotIndex + 1 < slots.length) {
+                    renderedSlots.add(slots[slotIndex + 1]);
+                }
+            }
+        }
+
+        bookingsColumn.appendChild(cell);
+    });
+
+    calendarGrid.appendChild(timeColumn);
+    calendarGrid.appendChild(bookingsColumn);
+    calendarRoot.appendChild(calendarGrid);
+    container.appendChild(calendarRoot);
 }
 
 function updateStudioView() {
