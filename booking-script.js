@@ -1854,7 +1854,7 @@ async function submitNewBooking() {
     }
     
     // Check if slot is available
-    const validation = validateBooking(studio, startTime, duration);
+    const validation = validateBooking(studio, startTime, duration, partnerEmail);
     if (!validation.valid) {
         alert(validation.message);
         return;
@@ -2042,20 +2042,55 @@ function addMinutes(date, minutes) {
     return result;
 }
 
-function validateBooking(studio, startTime, duration) {
-    // Check max total booking time
-    const userBookings = allBookings.filter(b => 
-        normalizeEmail(b.extendedProperties?.private?.userEmail) === normalizeEmail(currentUser?.email)
-    );
+function validateBooking(studio, startTime, duration, partnerEmail = '') {
+    // Check max booking time per zone AND per photographer+model combination
+    // The 60-minute limit applies to each unique combination of:
+    // 1. Zone (studioId)
+    // 2. Photographer + Model pair (regardless of who is creator/partner)
     
-    const totalMinutes = userBookings.reduce((sum, b) => {
+    const currentUserEmailNormalized = normalizeEmail(currentUser?.email);
+    const partnerEmailNormalized = normalizeEmail(partnerEmail);
+    
+    // Filter bookings for the same zone AND same photographer+model combination
+    const relevantBookings = allBookings.filter(b => {
+        const props = b.extendedProperties?.private || {};
+        
+        // Must be same zone
+        if (props.studioId !== studio.id) return false;
+        
+        // If no partner in current booking, only check bookings by current user without partner
+        if (!partnerEmailNormalized) {
+            const bookingUserEmail = normalizeEmail(props.userEmail || '');
+            const bookingPartnerEmail = normalizeEmail(props.partnerEmail || '');
+            // Only count solo bookings by current user
+            return bookingUserEmail === currentUserEmailNormalized && !bookingPartnerEmail;
+        }
+        
+        const bookingUserEmail = normalizeEmail(props.userEmail || '');
+        const bookingPartnerEmail = normalizeEmail(props.partnerEmail || '');
+        
+        // Check if this booking has the same photographer+model pair
+        // (regardless of who is creator or partner)
+        const hasSamePair = 
+            (bookingUserEmail === currentUserEmailNormalized && bookingPartnerEmail === partnerEmailNormalized) ||
+            (bookingUserEmail === partnerEmailNormalized && bookingPartnerEmail === currentUserEmailNormalized);
+        
+        return hasSamePair;
+    });
+    
+    // Sum up the duration of relevant bookings
+    const totalMinutes = relevantBookings.reduce((sum, b) => {
         return sum + parseInt(b.extendedProperties?.private?.duration || 0);
     }, 0);
     
     if (totalMinutes + duration > BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME) {
+        const partnerName = partnerEmail ? getDisplayNameByEmail(partnerEmail) : null;
+        const limitMessage = partnerName 
+            ? `Max. Buchungszeit für ${studio.name} mit ${partnerName} (${BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME} Min.) überschritten! Bereits gebucht: ${totalMinutes} Min.`
+            : `Max. Buchungszeit für ${studio.name} (${BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME} Min.) überschritten! Bereits gebucht: ${totalMinutes} Min.`;
         return {
             valid: false,
-            message: `Max. Buchungszeit (${BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME} Min.) überschritten!`
+            message: limitMessage
         };
     }
     
