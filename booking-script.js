@@ -2242,16 +2242,16 @@ function validateBooking(studio, startTime, duration, partnerEmail = '') {
         return sum + parseInt(b.extendedProperties?.private?.duration || 0);
     }, 0);
     
-    if (totalMinutes + duration > BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME) {
-        const partnerName = partnerEmail ? getDisplayNameByEmail(partnerEmail) : null;
-        const limitMessage = partnerName 
-            ? `Max. Buchungszeit für ${studio.name} mit ${partnerName} (${BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME} Min.) überschritten! Bereits gebucht: ${totalMinutes} Min.`
-            : `Max. Buchungszeit für ${studio.name} (${BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME} Min.) überschritten! Bereits gebucht: ${totalMinutes} Min.`;
-        return {
-            valid: false,
-            message: limitMessage
-        };
-    }
+//    if (totalMinutes + duration > BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME) {
+//        const partnerName = partnerEmail ? getDisplayNameByEmail(partnerEmail) : null;
+//        const limitMessage = partnerName 
+//            ? `Max. Buchungszeit für ${studio.name} mit ${partnerName} (${BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME} Min.) überschritten! Bereits gebucht: ${totalMinutes} Min.`
+//            : `Max. Buchungszeit für ${studio.name} (${BOOKING_CONFIG.RULES.MAX_TOTAL_BOOKING_TIME} Min.) überschritten! Bereits gebucht: ${totalMinutes} Min.`;
+//        return {
+//            valid: false,
+//            message: limitMessage
+//       };
+//    }
     
     // Check studio availability for all time slots in the booking duration
     const [hours, minutes] = startTime.split(':').map(Number);
