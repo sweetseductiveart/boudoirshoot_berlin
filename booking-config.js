@@ -139,7 +139,8 @@ const BOOKING_CONFIG = {
         MAX_TOTAL_BOOKING_TIME: 60, // Maximale Gesamtbuchungszeit pro Nutzer in Minuten
         SLOT_INTERVAL: 30, // Zeitslots in 30-Minuten-Intervallen
         ALLOW_PARALLEL_BOOKINGS: false, // Nutzer kann keine parallelen Slots buchen
-        ALLOW_OVERBOOKING: false // Reservierte Slots können nicht überbucht werden
+        ALLOW_OVERBOOKING: false, // Reservierte Slots können nicht überbucht werden
+        ALLOW_NON_ADMIN_MODIFICATIONS: true // Wenn false, dürfen nur Admins Buchungen ändern
     }
 };
 

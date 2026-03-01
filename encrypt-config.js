@@ -52,13 +52,17 @@ try {
     
     console.log(`📖 Reading config from: ${configPath}`);
     const configContent = fs.readFileSync(configPath, 'utf8');
-    const AUTHORIZED_USERS = JSON.parse(configContent);
+    const configData = JSON.parse(configContent);
     
-    console.log(`✅ Loaded ${AUTHORIZED_USERS.length} users`);
+    // Extract the structure - it should be { config: {...}, users: [...] }
+    const dataToEncrypt = configData;
+    const userCount = configData.users ? configData.users.length : Array.isArray(configData) ? configData.length : 0;
     
-    const encrypted = encryptData(AUTHORIZED_USERS, secret);
+    console.log(`✅ Loaded ${userCount} users`);
+    
+    const encrypted = encryptData(dataToEncrypt, secret);
 
-    console.log('\n🔐 AUTHORIZED_USERS encrypted successfully!\n');
+    console.log('\n🔐 Config encrypted successfully!\n');
     console.log('Encrypted value for config/authorized-users.encrypted.json:\n');
     console.log(encrypted);
     
@@ -67,7 +71,7 @@ try {
     const encryptedContent = {
         encrypted: encrypted,
         generatedAt: new Date().toISOString(),
-        userCount: AUTHORIZED_USERS.length
+        userCount: userCount
     };
     
     fs.writeFileSync(encryptedPath, JSON.stringify(encryptedContent, null, 2));
