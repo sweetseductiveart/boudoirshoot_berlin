@@ -1534,14 +1534,19 @@ function updatePersonalCalendarView() {
             const duration = parseInt(props.duration || 30, 10);
             const creatorEmail = getCreatorEmail(booking, props);
             const isCreator = normalizeEmail(creatorEmail) === normalizeEmail(selectedEmail);
-            const partner = props.partner || props.partnerEmail || '-';
+            const summaryPrefix = (booking.summary || '').split(' - ')[0] || '';
+            const studioName = studio?.name || props.studioName || booking.location || summaryPrefix || 'Unbekannt';
+            const partner = getDisplayNameByEmail(props.partnerEmail) || props.partner || '-';
+            const partnerStatus = getPartnerStatusLabel(props);
+            const partnerStatusLine = partnerStatus ? `<div class="personal-calendar-booking-detail">${partnerStatus}</div>` : '';
 
             cell.innerHTML = `
                 <div class="personal-calendar-booking ${duration === 60 ? 'personal-calendar-booking--double' : ''}">
-                    <div class="personal-calendar-booking-title">${studio?.name || 'Unbekannt'}</div>
+                    <div class="personal-calendar-booking-title">${studioName}</div>
                     <div class="personal-calendar-booking-meta"><strong>${slot}</strong> (${duration}min)</div>
                     <div class="personal-calendar-booking-detail">Partner: ${partner}</div>
                     <div class="personal-calendar-booking-detail">${isCreator ? 'Meine Buchung' : 'Als Partner'}</div>
+                    ${partnerStatusLine}
                     <div class="personal-calendar-booking-actions">
                         <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
                     </div>

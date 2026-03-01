@@ -992,7 +992,7 @@ body {
 
 .personal-calendar-time-col {
     display: grid;
-    grid-auto-rows: 80px;
+    grid-auto-rows: 92px;
     background: var(--bg);
     border-right: 2px solid var(--line);
     position: sticky;
@@ -1014,7 +1014,7 @@ body {
 
 .personal-calendar-bookings-col {
     display: grid;
-    grid-auto-rows: 80px;
+    grid-auto-rows: 92px;
     min-width: 0;
 }
 
@@ -1695,7 +1695,7 @@ body {
 
     .personal-calendar-time-col,
     .personal-calendar-bookings-col {
-        grid-auto-rows: 70px;
+        grid-auto-rows: 78px;
     }
 
     .personal-calendar-time-slot {
