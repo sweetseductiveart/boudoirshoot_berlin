@@ -1577,7 +1577,7 @@ function showBookingModal(eventId) {
     let partnerUI = `<p><strong>Partner:</strong> ${currentPartnerName || '-'}</p>`;
     if ((isCreator || isAdmin) && isPartnerCanceled && canModify) {
         const partnerOptions = BOOKING_CONFIG.AUTHORIZED_USERS
-            .filter(u => u.email !== props.userEmail)
+            .filter(u => normalizeEmail(u.email) !== normalizeEmail(props.userEmail))
             .map(u => `<option value="${u.email}">${u.name}</option>`)
             .join('');
         
@@ -1655,7 +1655,7 @@ async function confirmNewPartner() {
     // Find partner name if selected
     let newPartnerName = '';
     if (newPartnerEmail) {
-        const partnerUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => u.email === newPartnerEmail);
+        const partnerUser = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => normalizeEmail(u.email) === normalizeEmail(newPartnerEmail));
         newPartnerName = partnerUser?.name || newPartnerEmail;
     }
     
@@ -1809,18 +1809,18 @@ function populatePartnerDropdown() {
     partnerSelect.innerHTML = '<option value="">-- Bitte wählen --</option>';
     
     // Get current user's default partner
-    const currentUserData = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => u.email === currentUser?.email);
+    const currentUserData = BOOKING_CONFIG.AUTHORIZED_USERS.find(u => normalizeEmail(u.email) === normalizeEmail(currentUser?.email));
     const defaultPartnerEmail = currentUserData?.defaultPartner;
     
     // Add all other users as options (exclude current user)
     BOOKING_CONFIG.AUTHORIZED_USERS.forEach(user => {
-        if (user.email !== currentUser?.email) {
+        if (normalizeEmail(user.email) !== normalizeEmail(currentUser?.email)) {
             const option = document.createElement('option');
             option.value = user.email;
             option.textContent = `${user.name} (${user.role})`;
             
             // Pre-select default partner
-            if (user.email === defaultPartnerEmail) {
+            if (normalizeEmail(user.email) === normalizeEmail(defaultPartnerEmail)) {
                 option.selected = true;
             }
             
@@ -2045,7 +2045,7 @@ function addMinutes(date, minutes) {
 function validateBooking(studio, startTime, duration) {
     // Check max total booking time
     const userBookings = allBookings.filter(b => 
-        b.extendedProperties?.private?.userEmail === currentUser?.email
+        normalizeEmail(b.extendedProperties?.private?.userEmail) === normalizeEmail(currentUser?.email)
     );
     
     const totalMinutes = userBookings.reduce((sum, b) => {
