@@ -1547,18 +1547,21 @@ function updatePersonalCalendarView() {
             if (partnerStatus) {
                 details.push(partnerStatus);
             }
-            const maxDetails = duration === 60 ? 3 : 1;
+            const maxDetails = duration === 60 ? 3 : 0;
             const detailsHtml = details
                 .slice(0, maxDetails)
                 .map(detail => `<div class="personal-calendar-booking-detail">${detail}</div>`)
                 .join('');
+            const actionsClass = duration === 60
+                ? 'personal-calendar-booking-actions'
+                : 'personal-calendar-booking-actions personal-calendar-booking-actions--compact';
 
             cell.innerHTML = `
                 <div class="personal-calendar-booking ${duration === 60 ? 'personal-calendar-booking--double' : 'personal-calendar-booking--compact'}">
                     <div class="personal-calendar-booking-title">${studioName}</div>
                     <div class="personal-calendar-booking-meta"><strong>${slot}</strong> (${duration}min)</div>
                     ${detailsHtml}
-                    <div class="personal-calendar-booking-actions">
+                    <div class="${actionsClass}">
                         <button class="btn btn-small btn-primary" data-action="details" data-event="${booking.id}">Details</button>
                     </div>
                 </div>

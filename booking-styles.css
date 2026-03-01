@@ -1043,6 +1043,7 @@ body {
 
 .personal-calendar-booking--compact {
     gap: 1px;
+    padding: 4px;
 }
 
 .personal-calendar-booking-title {
@@ -1052,6 +1053,25 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.personal-calendar-booking--compact .personal-calendar-booking-title {
+    font-size: 11px;
+}
+
+.personal-calendar-booking--compact .personal-calendar-booking-meta {
+    font-size: 10px;
+    line-height: 1.1;
+}
+
+.personal-calendar-booking-actions--compact {
+    margin-top: 2px;
+}
+
+.personal-calendar-booking-actions--compact .btn-small {
+    padding: 2px 6px;
+    font-size: 9px;
+    line-height: 1.1;
 }
 
 .personal-calendar-booking-meta {
