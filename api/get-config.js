@@ -74,12 +74,26 @@ export default async (req, res) => {
         
         console.log('🔐 Decrypting config with ENCRYPTION_SECRET...');
         // Decrypt the data using the secret
-        const authorizedUsers = decryptData(encryptedData, secret);
+        const decryptedData = decryptData(encryptedData, secret);
+        
+        // Extract users array and config object from decrypted data
+        let authorizedUsers = [];
+        let config = {};
+        
+        if (Array.isArray(decryptedData)) {
+            // Old format: just an array of users
+            authorizedUsers = decryptedData;
+        } else if (decryptedData.users && Array.isArray(decryptedData.users)) {
+            // New format: { config: {...}, users: [...] }
+            authorizedUsers = decryptedData.users;
+            config = decryptedData.config || {};
+        }
         
         // Return the decrypted config
         res.status(200).json({
             success: true,
-            AUTHORIZED_USERS: authorizedUsers
+            AUTHORIZED_USERS: authorizedUsers,
+            CONFIG: config
         });
         
     } catch (error) {
