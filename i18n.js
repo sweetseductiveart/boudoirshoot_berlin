@@ -148,6 +148,7 @@ const translations = {
     anmeldungTitle: 'Anmeldung',
     anmeldungSubtitle: 'first confirmed • first served',
     anmeldungNotice: '<strong>Wichtig:</strong> Die Anmeldung ist zunächst eine Interessensbekundung. Nach kurzer Prüfung versenden wir die Zahlungsinformationen. Erst mit Zahlungseingang ist die Teilnahme verbindlich bestätigt.',
+    anmeldungBinding: '<strong>Verbindlichkeit & Platzweitergabe:</strong> Mit Zahlungseingang wird die Teilnahme verbindlich. Eine Kostenrückerstattung ist ausgeschlossen. Solltest du nicht teilnehmen können, kannst du deinen Platz an eine andere Person weitervermitteln – die Zahlung bleibt bestehen und wird auf die neue Person übertragen. Bitte informiere uns in diesem Fall rechtzeitig.',
 
     // Quick Facts (Sidebar)
     quickFactsTitle: 'Quick Facts',
@@ -361,6 +362,7 @@ const translations = {
     anmeldungTitle: 'Registration',
     anmeldungSubtitle: 'first confirmed • first served',
     anmeldungNotice: '<strong>Important:</strong> Registration is initially an expression of interest. After brief review, we will send payment information. Participation is only confirmed with payment received.',
+    anmeldungBinding: '<strong>Binding Terms & Seat Transfer:</strong> Participation becomes binding with payment receipt. Refunds are excluded. If you cannot participate, you can transfer your seat to another person – the payment remains with us and is transferred to the new person. Please notify us promptly in this case.',
 
     // Quick Facts (Sidebar)
     quickFactsTitle: 'Quick Facts',
