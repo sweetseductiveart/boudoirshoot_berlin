@@ -948,6 +948,10 @@ body {
     background: var(--panelB);
 }
 
+#exportOwnBookingsIcs {
+    align-self: stretch;
+}
+
 .personal-toggle-btn {
     border: 0;
     background: transparent;
@@ -1696,6 +1700,10 @@ body {
     }
 
     .personal-view-toggle {
+        width: 100%;
+    }
+
+    #exportOwnBookingsIcs {
         width: 100%;
     }
 

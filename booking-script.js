@@ -79,6 +79,11 @@ function initializeUI() {
         updateURLHash();
     });
 
+    const exportOwnBookingsBtn = document.getElementById('exportOwnBookingsIcs');
+    if (exportOwnBookingsBtn) {
+        exportOwnBookingsBtn.addEventListener('click', exportSelectedUserOwnBookingsAsIcs);
+    }
+
     document.querySelectorAll('.personal-toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const nextMode = btn.dataset.personalViewMode;
@@ -583,7 +588,7 @@ function canModifyBooking(bookingUserEmail) {
 }
 
 function getDisplayNameByEmail(email) {
-    return getAuthorizedUserByEmail(email)?.name || email || '';
+    return getAuthorizedUserByEmail(email)?.name || '';
 }
 
 function getCreatorEmail(booking, props) {
@@ -1328,6 +1333,132 @@ function updatePersonalView() {
         return updatePersonalCalendarView();
     }
     return updatePersonalTableView();
+}
+
+function getOwnBookingsForEmail(email) {
+    return allBookings
+        .filter(booking => {
+            const props = booking.extendedProperties?.private || {};
+            const creatorEmail = getCreatorEmail(booking, props);
+            return normalizeEmail(creatorEmail) === normalizeEmail(email);
+        })
+        .sort((a, b) => new Date(a.start?.dateTime || 0) - new Date(b.start?.dateTime || 0));
+}
+
+function exportSelectedUserOwnBookingsAsIcs() {
+    const selectedEmail = document.getElementById('userSelect')?.value;
+    if (!selectedEmail) {
+        alert('Bitte zuerst einen Nutzer auswählen.');
+        return;
+    }
+
+    const ownBookings = getOwnBookingsForEmail(selectedEmail);
+    if (ownBookings.length === 0) {
+        alert('Keine eigenen Buchungen zum Exportieren vorhanden.');
+        return;
+    }
+
+    const selectedUser = getAuthorizedUserByEmail(selectedEmail);
+    const ownerName = selectedUser?.name || selectedEmail;
+    const calendarName = `Buchungen - ${ownerName}`;
+    const icsContent = buildIcsCalendar(ownBookings, calendarName);
+    const filenameBase = (ownerName || 'buchungen')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'buchungen';
+    const dateSuffix = (BOOKING_CONFIG.EVENT_DATE || new Date().toISOString().slice(0, 10)).replace(/[^0-9-]/g, '');
+
+    downloadTextFile(`${filenameBase}-${dateSuffix}.ics`, icsContent, 'text/calendar;charset=utf-8');
+}
+
+function buildIcsCalendar(bookings, calendarName) {
+    const eventBlocks = bookings
+        .map(buildIcsEvent)
+        .filter(Boolean)
+        .join('\r\n');
+
+    return [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Boudoir Event//Booking System//DE',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        `X-WR-CALNAME:${escapeIcsText(calendarName)}`,
+        eventBlocks,
+        'END:VCALENDAR',
+        ''
+    ].join('\r\n');
+}
+
+function buildIcsEvent(booking) {
+    const startRaw = booking?.start?.dateTime;
+    const endRaw = booking?.end?.dateTime;
+    if (!startRaw || !endRaw) {
+        return '';
+    }
+
+    const startDate = new Date(startRaw);
+    const endDate = new Date(endRaw);
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        return '';
+    }
+
+    const props = booking.extendedProperties?.private || {};
+    const studio = BOOKING_CONFIG.STUDIOS.find(s => s.id === props.studioId);
+    const studioName = studio?.name || props.studioName || booking.location || 'Studio';
+    const partnerName = getDisplayNameByEmail(props.partnerEmail) || props.partner || '';
+    const partnerStatus = getPartnerStatusLabel(props);
+    const descriptionParts = [
+        `Studio: ${studioName}`,
+        `Dauer: ${props.duration || 30} Minuten`
+    ];
+
+    if (partnerName) {
+        descriptionParts.push(`Partner: ${partnerName}`);
+    }
+    if (partnerStatus) {
+        descriptionParts.push(`Status: ${partnerStatus}`);
+    }
+
+    const uid = `${(booking.id || `booking-${startDate.getTime()}`).replace(/[^a-zA-Z0-9._-]/g, '')}@boudoir-booking`;
+    const summary = booking.summary || `${studioName} Buchung`;
+
+    return [
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${toIcsUtcTimestamp(new Date())}`,
+        `DTSTART:${toIcsUtcTimestamp(startDate)}`,
+        `DTEND:${toIcsUtcTimestamp(endDate)}`,
+        `SUMMARY:${escapeIcsText(summary)}`,
+        `LOCATION:${escapeIcsText(studioName)}`,
+        `DESCRIPTION:${escapeIcsText(descriptionParts.join('\n'))}`,
+        'END:VEVENT'
+    ].join('\r\n');
+}
+
+function toIcsUtcTimestamp(date) {
+    const pad = value => String(value).padStart(2, '0');
+    return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
+}
+
+function escapeIcsText(value) {
+    return String(value || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/\r?\n/g, '\\n')
+        .replace(/,/g, '\\,')
+        .replace(/;/g, '\\;');
+}
+
+function downloadTextFile(filename, content, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const objectUrl = URL.createObjectURL(blob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = objectUrl;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    URL.revokeObjectURL(objectUrl);
 }
 
 function updatePersonalTableView() {
